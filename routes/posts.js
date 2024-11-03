@@ -1,0 +1,29 @@
+import express from "express";
+import {
+    createPost,
+    updatePost,
+    deletePost,
+    getSinglePost,
+    getAllPost,
+} from "../controllers/postController.js";
+
+import { verifyAdmin, verifyUser } from "../utils/verifyToken.js";
+
+const router = express.Router();
+
+// create a new post
+router.post("/", verifyAdmin, createPost);
+
+// update a post
+router.put("/:id", verifyAdmin, updatePost);
+
+// delete a post
+router.delete("/:id", verifyAdmin, deletePost);
+
+// get a single post
+router.get("/:id", getSinglePost);
+
+// get all posts
+router.get("/", getAllPost);
+
+export default router;

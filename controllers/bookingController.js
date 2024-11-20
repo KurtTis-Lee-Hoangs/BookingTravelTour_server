@@ -14,7 +14,7 @@ export const createBooking = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Something was wrong with the information input",
     });
   }
 };
@@ -53,6 +53,26 @@ export const getAllBooking = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Get all booking failed. Not found booking",
+    });
+  }
+};
+
+// Get bookings by userId
+export const getUserBookings = async (req, res) => {
+  try {
+    // Lọc bookings dựa trên userId trùng với _id người dùng đã đăng nhập
+    const bookings = await Booking.find({ userId: req.user.id });
+    
+    res.status(200).json({
+      success: true,
+      message: "Get booking history successfully",
+      data: bookings,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch booking history",
+      error: err.message,
     });
   }
 };

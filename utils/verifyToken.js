@@ -31,7 +31,7 @@ export const verifyUser = (req, res, next) => {
     console.log(req.user)
     // console.log(req.user.id)
     // console.log(req.params.id)
-    if (req.user.id === req.params.id || req.user.role === "admin") {
+    if (req.user.id === req.params.id || req.user.role === "admin" || req.user.role === "user") {
       console.log('user is true')
       next();
     } else {

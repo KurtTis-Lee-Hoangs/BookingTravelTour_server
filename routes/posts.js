@@ -4,7 +4,9 @@ import {
     updatePost,
     deletePost,
     getSinglePost,
-    getAllPost,
+    getAllPostByUser,
+    getPostCount,
+    getAllPostByAdmin,
 } from "../controllers/postController.js";
 
 import { verifyAdmin, verifyUser } from "../utils/verifyToken.js";
@@ -24,6 +26,12 @@ router.delete("/:id", verifyAdmin, deletePost);
 router.get("/:id", getSinglePost);
 
 // get all posts
-router.get("/", getAllPost);
+router.get("/user/getAllPostByUser", getAllPostByUser);
+
+// get all tours admin
+router.get("/", verifyAdmin, getAllPostByAdmin);
+
+// get post counts
+router.get("/search/getPostCount", getPostCount);
 
 export default router;

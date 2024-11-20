@@ -4,13 +4,14 @@ import {
   updateTour,
   deleteTour,
   getSingleTour,
-  getAllTour,
+  getAllTourByUser,
+  getAllTourByAdmin,
   getTourBySearch,
   getFeaturedTour,
   getTourCount,
 } from "../controllers/tourController.js";
 
-import { verifyAdmin } from "../utils/verifyToken.js";
+import { verifyAdmin, verifyUser } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
@@ -26,8 +27,11 @@ router.delete("/:id", verifyAdmin, deleteTour);
 // get a single tour
 router.get("/:id", getSingleTour);
 
-// get all tours
-router.get("/", getAllTour);
+// get all tours user
+router.get("/user/getAllTourByUser", getAllTourByUser);
+
+// get all tours admin
+router.get("/", verifyAdmin, getAllTourByAdmin);
 
 // get tour by search
 router.get("/search/getTourBySearch", getTourBySearch);

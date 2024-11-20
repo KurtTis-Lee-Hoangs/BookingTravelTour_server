@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 
 const verifyToken = (req, res, next) => {
   const token = req.cookies.accessToken;
+  console.log("🚀 ~ verifyToken ~ token:", token)
+  console.log('Here')
 
   if (!token) {
     return res.status(401).json({
@@ -25,10 +27,15 @@ const verifyToken = (req, res, next) => {
 };
 
 export const verifyUser = (req, res, next) => {
-  verifyToken(req, res, next, () => {
+  verifyToken(req, res, () => {
+    console.log(req.user)
+    // console.log(req.user.id)
+    // console.log(req.params.id)
     if (req.user.id === req.params.id || req.user.role === "admin") {
+      console.log('user is true')
       next();
     } else {
+      console.log('user is false')
       return res.status(401).json({
         success: false,
         message: "You're not authenticated",
@@ -38,8 +45,10 @@ export const verifyUser = (req, res, next) => {
 };
 
 export const verifyAdmin = (req, res, next) => {
-  verifyToken(req, res, next, () => {
+  verifyToken(req, res, () => {
+    console.log(req.user)
     if (req.user.role === "admin") {
+      console.log('admin is true')
       next();
     } else {
       return res.status(401).json({

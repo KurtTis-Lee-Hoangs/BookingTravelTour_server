@@ -85,24 +85,61 @@ export const getSinglePost = async (req, res) => {
 };
 
 // Get all post or tip
-export const getAllPost = async (req, res) => {
+export const getAllPostByUser = async (req, res) => {
   // pagianaion
   const page = parseInt(req.query.page);
+
   try {
-    const postAll = await Post.find()
-    .skip(page * 8)
-    .limit(8);;
+    const posts = await Post.find({})
+      .skip(page * 8)
+      .limit(8);
 
     res.status(200).json({
       success: true,
-      message: "Get all post successfully",
-      count: postAll.length,
-      data: postAll,
+      count: posts.length,
+      message: "Sussessfully get all tours",
+      data: posts,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Not found the tours. Try again",
+    });
+  }
+};
+
+// Get all post by admin
+export const getAllPostByAdmin = async (req, res) => {
+  try {
+    const posts = await Post.find({})
+
+    res.status(200).json({
+      success: true,
+      count: posts.length,
+      message: "Sussessfully get all posts",
+      data: posts,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Not found the post. Try again",
+    });
+  }
+};
+
+// get post counts
+export const getPostCount = async (req, res) => {
+  try {
+    const postCount = await Post.estimatedDocumentCount();
+
+    res.status(200).json({
+      success: true,
+      data: postCount,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Get all post failed. Not found post",
+      message: "Failed to fetch",
     });
   }
 };

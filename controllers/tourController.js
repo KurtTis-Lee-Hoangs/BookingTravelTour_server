@@ -85,8 +85,8 @@ export const getSingleTour = async (req, res) => {
   }
 };
 
-// Get all tour
-export const getAllTour = async (req, res) => {
+// Get all tour by user
+export const getAllTourByUser = async (req, res) => {
   // pagianaion
   const page = parseInt(req.query.page);
 
@@ -110,24 +110,19 @@ export const getAllTour = async (req, res) => {
   }
 };
 
-// get tour by search
-export const getTourBySearch = async (req, res) => {
-  // here "i" means case sensitive
-  const city = new RegExp(req.query.city, "i");
-  const day = parseInt(req.query.day);
-  const maxGroupSize = parseInt(req.query.maxGroupSize);
+// Get all tour by admin
+export const getAllTourByAdmin = async (req, res) => {
+  // pagianaion
+  const page = parseInt(req.query.page);
 
   try {
-    // gte means greater than or equal
-    const tours = await Tour.find({
-      city,
-      day: { $gte: day },
-      maxGroupSize: { $gte: maxGroupSize },
-    }).populate("reviews");
+    const tours = await Tour.find({})
+      .populate("reviews")
 
     res.status(200).json({
       success: true,
-      message: "Sussessfully get tours",
+      count: tours.length,
+      message: "Sussessfully get all tours",
       data: tours,
     });
   } catch (err) {
@@ -136,37 +131,65 @@ export const getTourBySearch = async (req, res) => {
       message: "Not found the tours. Try again",
     });
   }
+};
 
-
-  // // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
-  // const searchConditions = {};
-
-  // // Kiểm tra từng trường và thêm vào điều kiện nếu có giá trị
-  // if (req.query.city) {
-  //   searchConditions.city = new RegExp(req.query.city, "i");
-  // }
-  // if (req.query.distance) {
-  //   searchConditions.distance = { $gte: parseInt(req.query.distance) };
-  // }
-  // if (req.query.maxGroupSize) {
-  //   searchConditions.maxGroupSize = { $gte: parseInt(req.query.maxGroupSize) };
-  // }
+// get tour by search
+export const getTourBySearch = async (req, res) => {
+  // // here "i" means case sensitive
+  // const city = new RegExp(req.query.city, "i");
+  // const day = parseInt(req.query.day);
+  // const maxGroupSize = parseInt(req.query.maxGroupSize);
 
   // try {
-  //   // Thực hiện tìm kiếm với các điều kiện đã xây dựng
-  //   const tours = await Tour.find(searchConditions).populate("reviews");
+  //   // gte means greater than or equal
+  //   const tours = await Tour.find({
+  //     city,
+  //     day: { $gte: day },
+  //     maxGroupSize: { $gte: maxGroupSize },
+  //   }).populate("reviews");
 
   //   res.status(200).json({
   //     success: true,
-  //     message: "Successfully retrieved tours",
+  //     message: "Sussessfully get tours",
   //     data: tours,
   //   });
   // } catch (err) {
   //   res.status(404).json({
   //     success: false,
-  //     message: "Could not find tours. Please try again.",
+  //     message: "Not found the tours. Try again",
   //   });
   // }
+
+
+  // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
+  const searchConditions = {};
+
+  // Kiểm tra từng trường và thêm vào điều kiện nếu có giá trị
+  if (req.query.city) {
+    searchConditions.city = new RegExp(req.query.city, "i");
+  }
+  if (req.query.day) {
+    searchConditions.day = { $eq: parseInt(req.query.day) };
+  }
+  if (req.query.maxGroupSize) {
+    searchConditions.maxGroupSize = { $eq: parseInt(req.query.maxGroupSize) };
+  }
+
+  try {
+    // Thực hiện tìm kiếm với các điều kiện đã xây dựng
+    const tours = await Tour.find(searchConditions).populate("reviews");
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully retrieved tours",
+      data: tours,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Could not find tours. Please try again.",
+    });
+  }
 };
 
 // Get featured tour

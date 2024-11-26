@@ -9,6 +9,7 @@ import authRoute from './routes/auth.js';
 import reviewRoute from './routes/reviews.js';
 import bookingRoute from './routes/bookings.js';
 import postRoute from './routes/posts.js';
+import cloudinary from "cloudinary";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,12 @@ const corsOptions = {
     origin:true,
     credentials:true
 }
+
+cloudinary.config({
+    cloud_name: "dmbkgg1ac",
+    api_key: "617596218884563",
+    api_secret: "TCEqnvZW7eGCxSljGo5wDWOvwYg",
+  });
 
 // for testing
 // app.get('/', (req, res) => {

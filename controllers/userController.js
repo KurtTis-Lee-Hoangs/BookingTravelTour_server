@@ -54,33 +54,62 @@ export const createUser = async (req, res) => {
 
 // Update a User
 export const updateUser = async (req, res) => {
+  // const id = req.params.id;
+
+  // try {
+
+  //   // Check if password is provided in the request body
+  //   if (req.body.password) {
+  //     const salt = await bcrypt.genSalt(10);
+  //     req.body.password = await bcrypt.hash(req.body.password, salt);
+  //   }
+
+  //   const updatedUser = await User.findByIdAndUpdate(
+  //     id,
+  //     {
+  //       $set: req.body,
+  //     },
+  //     { new: true }
+  //   );
+
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "Sussessfully updated the user",
+  //     data: updatedUser,
+  //   });
+  // } catch (err) {
+  //   res.status(500).json({
+  //     success: false,
+  //     message: "Failed update a user. Try again",
+  //   });
+  // }
+
   const id = req.params.id;
 
+  // Check if password is provided in the request body
+  if (req.body.password) {
+    const salt = await bcrypt.genSalt(10);
+    req.body.password = await bcrypt.hash(req.body.password, salt);
+  }
+
+  // Check if there's a new avatar (Cloudinary URL)
+  if (req.body.avatar) {
+    // Optionally delete old avatar from Cloudinary (if you want)
+    // cloudinary.v2.uploader.destroy(old_avatar_public_id);
+  }
+
   try {
-
-    // Check if password is provided in the request body
-    if (req.body.password) {
-      const salt = await bcrypt.genSalt(10);
-      req.body.password = await bcrypt.hash(req.body.password, salt);
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    );
+    const updatedUser = await User.findByIdAndUpdate(id, { $set: req.body }, { new: true });
 
     res.status(200).json({
       success: true,
-      message: "Sussessfully updated the user",
+      message: "Successfully updated the user",
       data: updatedUser,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Failed update a user. Try again",
+      message: "Failed to update user. Try again",
     });
   }
 };

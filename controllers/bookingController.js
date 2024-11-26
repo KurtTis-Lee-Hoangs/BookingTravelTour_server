@@ -14,7 +14,7 @@ export const createBooking = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Something was wrong with the information input",
+      message: "Thông tin nhập vào đang bị sai",
     });
   }
 };

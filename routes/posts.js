@@ -7,6 +7,7 @@ import {
     getAllPostByUser,
     getPostCount,
     getAllPostByAdmin,
+    getPostBySearch,
 } from "../controllers/postController.js";
 
 import { verifyAdmin, verifyUser } from "../utils/verifyToken.js";
@@ -33,5 +34,8 @@ router.get("/", verifyAdmin, getAllPostByAdmin);
 
 // get post counts
 router.get("/search/getPostCount", getPostCount);
+
+// get post by search
+router.get("/search/getPostBySearch", getPostBySearch);
 
 export default router;

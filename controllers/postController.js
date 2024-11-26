@@ -143,3 +143,30 @@ export const getPostCount = async (req, res) => {
     });
   }
 };
+
+// get post by search
+export const getPostBySearch = async (req, res) => {
+  // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
+  const searchConditions = {};
+
+  // Kiểm tra từng trường và thêm vào điều kiện nếu có giá trị
+  if (req.query.title) {
+    searchConditions.title = new RegExp(req.query.title, "i");
+  }
+
+  try {
+    // Thực hiện tìm kiếm với các điều kiện đã xây dựng
+    const posts = await Post.find(searchConditions);
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully retrieved tours",
+      data: posts,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Could not find tours. Please try again.",
+    });
+  }
+};

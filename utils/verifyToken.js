@@ -6,6 +6,7 @@ const verifyToken = (req, res, next) => {
   console.log('Here')
 
   if (!token) {
+    console.log("🚀 ~ No token found");
     return res.status(401).json({
       success: false,
       message: "You're not authorize",
@@ -15,12 +16,14 @@ const verifyToken = (req, res, next) => {
   // if token is exist then verify the token
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
     if (err) {
+      console.log("🚀 ~ Token is invalid:", err.message);
       return res.status(401).json({
         success: false,
         message: "token is invalid",
       });
     }
 
+    console.log("🚀 ~ Decoded user:", user);
     req.user = user;
     next(); // fon't forget to call next() method
   });
@@ -48,9 +51,10 @@ export const verifyAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
     console.log(req.user)
     if (req.user.role === "admin") {
-      console.log('admin is true')
+      console.log("🚀 ~ Admin is true");
       next();
     } else {
+      console.log("🚀 ~ Not Admin");
       return res.status(401).json({
         success: false,
         message: "You're not authorize",

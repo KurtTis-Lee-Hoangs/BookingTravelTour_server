@@ -5,16 +5,21 @@ import {
   deleteUser,
   getSingleUser,
   getAllUser,
+  createUser
 } from "../controllers/userController.js";
 
 const router = express.Router();
 
+// create new user
+router.post('/', createUser);
+
 // update a user
-// router.put("/:id", verifyUser, updateUser);
-router.put("/:id", updateUser);
+router.put("/:id", verifyUser, updateUser);
+// router.put("/:id", updateUser);
 
 // delete a user
-router.delete("/:id", verifyUser, deleteUser);
+router.delete("/:id", verifyAdmin, deleteUser);
+// router.delete("/:id", deleteUser);
 
 // get a single user
 router.get("/:id", verifyUser, getSingleUser);

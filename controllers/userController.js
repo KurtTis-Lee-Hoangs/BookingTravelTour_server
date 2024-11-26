@@ -3,20 +3,51 @@ import bcrypt from "bcryptjs";
 
 // Create a new User
 export const createUser = async (req, res) => {
-  const newUser = new User(req.body);
+  // const newUser = new User(req.body);
+
+  // try {
+  //   const savedUser = await newUser.save();
+
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "Sussessfully created a new user",
+  //     data: savedUser,
+  //   });
+  // } catch (err) {
+  //   res.status(500).json({
+  //     success: false,
+  //     message: "Failed created a new user. Try again",
+  //   });
+  // }
+
+  const { username, email, password, role } = req.body;
+
+  // Check if the user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ success: false, message: "User already exists!" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = new User({
+    username,
+    email,
+    password: hashedPassword,
+    role
+  });
 
   try {
     const savedUser = await newUser.save();
-
     res.status(200).json({
       success: true,
-      message: "Sussessfully created a new user",
+      message: "Successfully created a new user",
       data: savedUser,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Failed created a new user. Try again",
+      message: "Failed to create a new user. Try again",
     });
   }
 };

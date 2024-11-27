@@ -25,7 +25,9 @@ export const createUser = async (req, res) => {
   // Check if the user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return res.status(400).json({ success: false, message: "User already exists!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "User already exists!" });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,7 +36,7 @@ export const createUser = async (req, res) => {
     username,
     email,
     password: hashedPassword,
-    role
+    role,
   });
 
   try {
@@ -99,7 +101,11 @@ export const updateUser = async (req, res) => {
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, { $set: req.body }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -155,9 +161,8 @@ export const getSingleUser = async (req, res) => {
 
 // Get all User
 export const getAllUser = async (req, res) => {
-
   try {
-    const users = await User.find({})
+    const users = await User.find({});
 
     res.status(200).json({
       success: true,

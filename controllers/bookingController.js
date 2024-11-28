@@ -1,19 +1,52 @@
 import Booking from "../models/Booking.js";
+import moment from "moment";
+import CryptoJS from "crypto-js";
+import configPayment from "../config/configPayment.js";
+import axios from "axios";
 
 // Create new booking
 export const createBooking = async (req, res) => {
+  // const newBooking = new Booking(req.body);
+
+  // try {
+  //   const savedBooking = await newBooking.save();
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "Your tour is booked successfully",
+  //     data: savedBooking,
+  //   });
+  // } catch (err) {
+  //   res.status(500).json({
+  //     success: false,
+  //     message: "Thông tin nhập vào đang bị sai",
+  //   });
+  // }
+  
+
   const newBooking = new Booking(req.body);
 
   try {
     const savedBooking = await newBooking.save();
+
+    const paymentUrl = await payment(savedBooking._id);
+    if (!paymentUrl) {
+      return res.status(503).json({
+        success: false,
+        message: "Payment creation failed.",
+      });
+    }
+
+    // Trả về URL để frontend xử lý việc chuyển hướng
     res.status(200).json({
       success: true,
-      message: "Your tour is booked successfully",
-      data: savedBooking,
+      message: "Booking created successfully",
+      tour: savedBooking,
+      paymentUrl: paymentUrl,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
+      // message: err.message,
       message: "Thông tin nhập vào đang bị sai",
     });
   }
@@ -47,6 +80,7 @@ export const getAllBooking = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Get booking successfully",
+      count: bookAll.length,
       data: bookAll,
     });
   } catch (err) {
@@ -75,4 +109,104 @@ export const getUserBookings = async (req, res) => {
       error: err.message,
     });
   }
+};
+
+export const payment = async (orderId) => {
+  const embed_data = {
+    redirecturl: "http://localhost:3000/thankyou",
+    logourl: "https://play-lh.googleusercontent.com/woYAzPCG1I8Z8HXCsdH3diL7oly0N8uth_1g6k7R_9Gu7lbxrsYeriEXLecRG2E9rP0=w240-h480-rw",
+  };
+
+  const orderInfo = await Booking.findById(orderId);
+  if (!orderInfo) {
+    throw new Error("Order not found");
+  }
+
+  const items = [{}];
+  const transID = Math.floor(Math.random() * 1000000);
+  const order = {
+    app_id: configPayment.app_id,
+    app_trans_id: `${moment().format("YYMMDD")}_${transID}`,
+    app_user: orderInfo._id,
+    app_time: Date.now(),
+    item: JSON.stringify(items),
+    embed_data: JSON.stringify(embed_data),
+    amount: orderInfo.totalPrice,
+    description: `Payment for the order #${transID}`,
+    bank_code: "",
+    callback_url:
+      "https://bdf7-14-169-20-242.ngrok-free.app/api/v1/booking/callback",
+  };
+
+  const data =
+    configPayment.app_id +
+    "|" +
+    order.app_trans_id +
+    "|" +
+    order.app_user +
+    "|" +
+    order.amount +
+    "|" +
+    order.app_time +
+    "|" +
+    order.embed_data +
+    "|" +
+    order.item;
+  order.mac = CryptoJS.HmacSHA256(data, configPayment.key1).toString();
+
+  try {
+    const result = await axios.post(configPayment.endpoint, null, {
+      params: order,
+    });
+
+    if (result.data && result.data.order_url) {
+      return result.data.order_url; // Return the payment URL
+    } else {
+      throw new Error("Payment service did not return an order URL");
+    }
+  } catch (error) {
+    console.error("Payment Error:", error.message);
+    throw new Error("Failed to process payment");
+  }
+};
+
+export const callback = async (req, res) => {
+  let result = {};
+
+  try {
+    let dataStr = req.body.data;
+    let reqMac = req.body.mac;
+
+    let mac = CryptoJS.HmacSHA256(dataStr, configPayment.key2).toString();
+    console.log("mac =", mac);
+
+    // kiểm tra callback hợp lệ (đến từ ZaloPay server)
+    if (reqMac !== mac) {
+      // callback không hợp lệ
+      result.return_cosde = -1;
+      result.return_message = "mac not equal";
+    } else {
+      // thanh toán thành công
+      // merchant cập nhật trạng thái cho đơn hàng
+      let dataJson = JSON.parse(dataStr, configPayment.key2);
+
+      await Booking.findOneAndUpdate(
+        { _id: dataJson["app_user"] },
+        { isPayment: true }
+      );
+      console.log(
+        "update order's status = success where app_trans_id =",
+        dataJson["app_trans_id"]
+      );
+
+      result.return_code = 1;
+      result.return_message = "success";
+    }
+  } catch (ex) {
+    result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
+    result.return_message = ex.message;
+  }
+
+  // thông báo kết quả cho ZaloPay server
+  res.json(result);
 };

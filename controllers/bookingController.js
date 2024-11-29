@@ -52,6 +52,51 @@ export const createBooking = async (req, res) => {
   }
 };
 
+// Update a booking
+export const updateBooking = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const updateBooking = await Booking.findByIdAndUpdate(
+      id,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Sussessfully updated the booking",
+      data: updateBooking,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed update a booking. Try again",
+    });
+  }
+};
+
+// Delete a booking
+export const deleteBooking = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    await Booking.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Sussessfully delete the booking",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed delete a booking. Try again",
+    });
+  }
+};
+
 // Get single bookings
 export const getBooking = async (req, res) => {
   const id = req.params.id;
@@ -135,7 +180,7 @@ export const payment = async (orderId) => {
     description: `Payment for the order #${transID}`,
     bank_code: "",
     callback_url:
-      "https://bdf7-14-169-20-242.ngrok-free.app/api/v1/booking/callback",
+      "https://16b3-14-169-20-242.ngrok-free.app/api/v1/bookings/callback",
   };
 
   const data =

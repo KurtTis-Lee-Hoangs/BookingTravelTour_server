@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-
+import {sendEmail} from "../utils/sendEmail.js"
 // Create a new User
 export const createUser = async (req, res) => {
   // const newUser = new User(req.body);
@@ -174,6 +174,43 @@ export const getAllUser = async (req, res) => {
     res.status(404).json({
       success: false,
       message: "Not found the users. Try again",
+    });
+  }
+};
+
+
+export const forgotPasswordCtrl = async (req, res) => {
+  const account = await User.findOne({ email: req.body.email });
+  if (!account) {
+    return res.status(401).json({
+      status: "failed",
+      message: "Account not found. Please check your email!",
+    });
+  }
+
+  // Tạo mật khẩu mới ngẫu nhiên
+  const newPassword = Math.random().toString(36).slice(-8); // Sinh mật khẩu 8 ký tự ngẫu nhiên
+  const hashedPassword = bcrypt.hashSync(newPassword, 10); // Hash mật khẩu mới
+
+  // Cập nhật mật khẩu trong cơ sở dữ liệu
+  account.password = hashedPassword;
+  await account.save();
+
+  try {
+    await sendEmail({
+      email: account.email,
+      subject: "Your New Password",
+      password: newPassword, // Truyền mật khẩu mới vào
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "A new password has been sent to your email!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      message: "Failed to send email. Please try again later.",
     });
   }
 };

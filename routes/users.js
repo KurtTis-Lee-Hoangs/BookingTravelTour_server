@@ -5,7 +5,8 @@ import {
   deleteUser,
   getSingleUser,
   getAllUser,
-  createUser
+  createUser,
+  forgotPasswordCtrl
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -27,5 +28,8 @@ router.get("/:id", verifyUser, getSingleUser);
 // get all users
 router.get("/", verifyAdmin, getAllUser);
 // router.get("/" , getAllUser);
+
+//forgot password
+router.post("/forgot-password", forgotPasswordCtrl)
 
 export default router;

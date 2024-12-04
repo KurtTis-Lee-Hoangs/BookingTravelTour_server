@@ -42,9 +42,9 @@ const conect = async () => {
   }
 };
 
-// app.get('/', (req, res) => {
-//   res.send("<button><a href='/api/v1/auth/google'>Login With Google</a></button>")
-// });
+app.get('/', (req, res) => {
+  res.send("<button><a href='/api/v1/auth/google'>Login With Google</a></button>")
+});
 
 // middleware
 app.use(passport.initialize())

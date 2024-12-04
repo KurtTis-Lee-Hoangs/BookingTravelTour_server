@@ -17,10 +17,9 @@ passport.use(
             googleId: profile.id,
             username: profile.displayName,
             email: profile.emails[0].value,
-            photo: profile.photos[0].value,
+            avatar: profile.photos[0].value,
           });
         }
-
         return done(null, user);
       } catch (err) {
         return done(err, null);

@@ -5,6 +5,11 @@ import jwt from "jsonwebtoken";
 // User registrantion
 export const register = async (req, res) => {
   try {
+    if (!req.body.password) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Password is required" });
+    }
     // hasing password
     const salt = await bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
@@ -90,4 +95,16 @@ export const login = async (req, res) => {
       message: "Failed to login",
     });
   }
+};
+
+export const googleCallback = (req, res) => {
+  // Tạo JWT sau khi xác thực thành công
+  const token = jwt.sign(
+    { id: req.user._id, email: req.user.email },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: "1d" }
+  );
+
+  const redirectUrl = `http://localhost:3000/homepage`;
+  res.redirect(redirectUrl);
 };

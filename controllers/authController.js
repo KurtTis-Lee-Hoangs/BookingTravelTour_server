@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import { verifyGoogleToken } from "../utils/verifyToken.js";
 // User registrantion
 export const register = async (req, res) => {
   try {
@@ -108,3 +108,16 @@ export const googleCallback = (req, res) => {
   const redirectUrl = `http://localhost:3000/homepage`;
   res.redirect(redirectUrl);
 };
+
+export const googleLogin = async(req, res) => {
+  const { credential } = req.body;
+  try {
+    const userData = await verifyGoogleToken(credential);
+    console.log(userData)
+
+    // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
+    res.status(200).json({ message: "Login successful", token: "YOUR_TOKEN" });
+  } catch (err) {
+    res.status(400).json({ message: "Invalid token" });
+  }
+}

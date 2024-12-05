@@ -3,6 +3,7 @@ import {
   register,
   login,
   googleCallback,
+  googleLogin,
 } from "../controllers/authController.js";
 import passport from "passport"
 
@@ -13,14 +14,7 @@ router.post("/register", register);
 
 // Login
 router.post("/login", login);
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { session: false }),
-  googleCallback
-);
+
+router.post("/google-login", googleLogin)
 
 export default router;

@@ -5,7 +5,10 @@ import {
   deleteUser,
   getSingleUser,
   getAllUser,
-  createUser
+  createUser,
+  updateFavorites,
+  getFavorites,
+  forgotPasswordCtrl
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -27,5 +30,10 @@ router.get("/:id", verifyUser, getSingleUser);
 // get all users
 router.get("/", verifyAdmin, getAllUser);
 // router.get("/" , getAllUser);
+
+// Route to handle adding/removing from favorites
+router.patch("/:id/favorites", verifyUser, updateFavorites);
+router.get("/:userId/favorites", getFavorites);
+router.post("/forgot-password", forgotPasswordCtrl)
 
 export default router;

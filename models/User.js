@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    googleId: String,
     username: {
       type: String,
       required: true,
@@ -26,6 +27,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
       // default: "admin",
+    },
+
+    favorites: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Tour",  // Bạn có thể tham chiếu đến bảng "Tour" nếu có bảng này
+      default: [],
     },
   },
   { timestamps: true }

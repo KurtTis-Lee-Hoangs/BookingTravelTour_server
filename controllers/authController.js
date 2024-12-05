@@ -1,10 +1,17 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { verifyGoogleToken } from "../utils/verifyToken.js";
 
 // User registrantion
 export const register = async (req, res) => {
   try {
+    if (!req.body.password) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Password is required" });
+    }
+
     // hasing password
     const salt = await bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
@@ -89,5 +96,50 @@ export const login = async (req, res) => {
       success: false,
       message: "Failed to login",
     });
+  }
+};
+
+export const googleCallback = (req, res) => {
+  // Tạo JWT sau khi xác thực thành công
+  const token = jwt.sign(
+    { id: req.user._id, email: req.user.email },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: "1d" }
+  );
+
+  const redirectUrl = `http://localhost:3000/homepage`;
+  res.redirect(redirectUrl);
+};
+
+export const googleLogin = async (req, res) => {
+  const { credential } = req.body;
+  try {
+    const userData = await verifyGoogleToken(credential);
+    console.log(userData);
+
+    const { sub: googleId, name: username, email, picture: avatar } = userData;
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({ googleId, username, email, avatar });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1d" }
+    );
+
+    // set token in browser cookies aand send the response to the client
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      exprires: token.expiresIn,
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      sameSite: "strict",
+    });
+    // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
+    res.status(200).json({ message: "Login successful", token: token });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 };

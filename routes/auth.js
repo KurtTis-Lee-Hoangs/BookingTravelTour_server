@@ -2,10 +2,8 @@ import express from "express";
 import {
   register,
   login,
-  googleCallback,
   googleLogin,
 } from "../controllers/authController.js";
-import passport from "passport"
 
 const router = express.Router();
 

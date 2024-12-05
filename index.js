@@ -10,8 +10,6 @@ import reviewRoute from "./routes/reviews.js";
 import bookingRoute from "./routes/bookings.js";
 import postRoute from "./routes/posts.js";
 import cloudinary from "cloudinary";
-import passport from "passport";
-import "./config/configPassport.js"
 
 dotenv.config();
 const app = express();
@@ -42,12 +40,7 @@ const conect = async () => {
   }
 };
 
-app.get('/', (req, res) => {
-  res.send("<button><a href='/api/v1/auth/google'>Login With Google</a></button>")
-});
-
 // middleware
-app.use(passport.initialize())
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());

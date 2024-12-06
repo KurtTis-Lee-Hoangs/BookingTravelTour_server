@@ -5,7 +5,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const verifyToken = (req, res, next) => {
   const token = req.cookies.accessToken;
   // console.log("🚀 ~ verifyToken ~ token:", token)
-  console.log('Here')
+  console.log("Here");
 
   if (!token) {
     // console.log("🚀 ~ No token found");
@@ -33,10 +33,14 @@ const verifyToken = (req, res, next) => {
 
 export const verifyUser = (req, res, next) => {
   verifyToken(req, res, () => {
-    console.log(req.user)
+    console.log(req.user);
     // console.log(req.user.id)
     // console.log(req.params.id)
-    if (req.user.id === req.params.id || req.user.role === "admin" || req.user.role === "user") {
+    if (
+      req.user.id === req.params.id ||
+      req.user.role === "admin" ||
+      req.user.role === "user"
+    ) {
       // console.log('user is true')
       next();
     } else {
@@ -51,7 +55,7 @@ export const verifyUser = (req, res, next) => {
 
 export const verifyAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
-    console.log(req.user)
+    console.log(req.user);
     if (req.user.role === "admin") {
       // console.log("🚀 ~ Admin is true");
       next();

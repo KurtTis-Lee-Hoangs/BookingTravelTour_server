@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      // required: true,
     },
+
     avatar: {
       type: String,
       default:
@@ -26,6 +28,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
       // default: "admin",
+    },
+
+    favorites: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Tour", // Bạn có thể tham chiếu đến bảng "Tour" nếu có bảng này
+      default: [],
     },
     isActive: { type: Boolean, default: false },
   },

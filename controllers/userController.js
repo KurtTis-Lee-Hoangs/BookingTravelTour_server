@@ -42,6 +42,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   const id = req.params.id;
   const userId = req.user;
+
   // Check if password is provided in the request body
   if (req.body.password) {
     const salt = await bcrypt.genSalt(10);
@@ -56,12 +57,14 @@ export const updateUser = async (req, res) => {
 
   const account = await User.findById(userId.id);
   if (!account) {
-    return res.status(404).json({success: false, message: "Account not found"});
+    return res
+      .status(404)
+      .json({ success: false, message: "Account not found" });
   }
-
   if (account.role === "user") {
     delete req.body.role;
   }
+
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -117,6 +120,7 @@ export const getSingleUser = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       success: false,
+      // message: "Not found the user. Try again",
       message: err.message,
     });
   }
@@ -266,7 +270,6 @@ export const SignOut = async (req, res) => {
       secure: true, // Đảm bảo chỉ hoạt động qua HTTPS
       sameSite: "strict", // Bảo vệ chống tấn công CSRF
     });
-
     res.status(200).json({
       success: true,
       message: "Successfully logged out",

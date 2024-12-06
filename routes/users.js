@@ -9,13 +9,13 @@ import {
   updateFavorites,
   getFavorites,
   forgotPasswordCtrl,
-  SignOut
+  SignOut,
 } from "../controllers/userController.js";
 
 const router = express.Router();
 
 // create new user
-router.post('/', createUser);
+router.post("/", createUser);
 
 // update a user
 router.put("/:id", verifyUser, updateUser);
@@ -35,7 +35,7 @@ router.get("/", verifyAdmin, getAllUser);
 // Route to handle adding/removing from favorites
 router.patch("/:id/favorites", verifyUser, updateFavorites);
 router.get("/:userId/favorites", getFavorites);
-router.post("/forgot-password", forgotPasswordCtrl)
-router.post("/sign-out", SignOut)
+router.post("/forgot-password", forgotPasswordCtrl);
+router.post("/sign-out", SignOut);
 
 export default router;

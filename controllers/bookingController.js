@@ -6,23 +6,6 @@ import axios from "axios";
 
 // Create new booking
 export const createBooking = async (req, res) => {
-  // const newBooking = new Booking(req.body);
-
-  // try {
-  //   const savedBooking = await newBooking.save();
-  //   res.status(200).json({
-  //     success: true,
-  //     message: "Your tour is booked successfully",
-  //     data: savedBooking,
-  //   });
-  // } catch (err) {
-  //   res.status(500).json({
-  //     success: false,
-  //     message: "Thông tin nhập vào đang bị sai",
-  //   });
-  // }
-  
-
   const newBooking = new Booking(req.body);
 
   try {
@@ -141,7 +124,7 @@ export const getUserBookings = async (req, res) => {
   try {
     // Lọc bookings dựa trên userId trùng với _id người dùng đã đăng nhập
     const bookings = await Booking.find({ userId: req.user.id });
-    
+
     res.status(200).json({
       success: true,
       message: "Get booking history successfully",
@@ -159,7 +142,8 @@ export const getUserBookings = async (req, res) => {
 export const payment = async (orderId) => {
   const embed_data = {
     redirecturl: "http://localhost:3000/thankyou",
-    logourl: "https://play-lh.googleusercontent.com/woYAzPCG1I8Z8HXCsdH3diL7oly0N8uth_1g6k7R_9Gu7lbxrsYeriEXLecRG2E9rP0=w240-h480-rw",
+    logourl:
+      "https://play-lh.googleusercontent.com/woYAzPCG1I8Z8HXCsdH3diL7oly0N8uth_1g6k7R_9Gu7lbxrsYeriEXLecRG2E9rP0=w240-h480-rw",
   };
 
   const orderInfo = await Booking.findById(orderId);

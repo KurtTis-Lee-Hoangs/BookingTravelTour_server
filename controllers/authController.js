@@ -157,14 +157,12 @@ export const googleLogin = async (req, res) => {
     });
 
     // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
-    res
-      .status(200)
-      .json({
-        message: "Login successful",
-        token: token,
-        data: user,
-        role: user.role,
-      });
+    res.status(200).json({
+      message: "Login successful",
+      token: token,
+      data: user,
+      role: user.role,
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

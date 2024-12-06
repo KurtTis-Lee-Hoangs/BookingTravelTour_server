@@ -111,7 +111,7 @@ export const getAllPostByUser = async (req, res) => {
 // Get all post by admin
 export const getAllPostByAdmin = async (req, res) => {
   try {
-    const posts = await Post.find({})
+    const posts = await Post.find({});
 
     res.status(200).json({
       success: true,

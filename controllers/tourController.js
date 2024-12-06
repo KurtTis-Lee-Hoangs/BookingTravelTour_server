@@ -116,8 +116,7 @@ export const getAllTourByAdmin = async (req, res) => {
   const page = parseInt(req.query.page);
 
   try {
-    const tours = await Tour.find({})
-      .populate("reviews")
+    const tours = await Tour.find({}).populate("reviews");
 
     res.status(200).json({
       success: true,
@@ -160,7 +159,6 @@ export const getTourBySearch = async (req, res) => {
   //   });
   // }
 
-
   // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
   const searchConditions = {};
 
@@ -194,7 +192,6 @@ export const getTourBySearch = async (req, res) => {
 
 // Get featured tour
 export const getFeaturedTour = async (req, res) => {
-
   const page = parseInt(req.query.page);
 
   try {

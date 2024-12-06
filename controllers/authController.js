@@ -2,11 +2,13 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { verifyGoogleToken } from "../utils/verifyToken.js";
+import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 // User registrantion
 export const register = async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    if (!req.body.password) {
+    if (!password) {
       return res
         .status(401)
         .json({ success: false, message: "Password is required" });
@@ -14,26 +16,40 @@ export const register = async (req, res) => {
 
     // hasing password
     const salt = await bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
+    const hash = bcrypt.hashSync(password, salt);
 
     const newUser = new User({
-      username: req.body.username,
-      email: req.body.email,
+      username,
+      email,
       password: hash,
       //   password: req.body.password,
       photo: req.body.photo,
     });
 
     await newUser.save();
+    const verificationToken = jwt.sign(
+      { user: newUser._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
 
-    res.status(200).json({
+    // Generate the verification link
+    const verificationLink = `${req.protocol}://${req.get(
+      "host"
+    )}/api/v1/auth/verify-email/${verificationToken}`;
+
+    // Send the verification email
+    await sendVerificationEmail(email, verificationLink);
+
+    res.status(201).json({
       success: true,
-      message: "Successfully created. User registered successfully",
+      message:
+        "Account registered successfully! Please verify your email to activate your account.",
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Failed to create. User registration failed. Try again",
+      message: err.message,
     });
   }
 };
@@ -139,10 +155,61 @@ export const googleLogin = async (req, res) => {
       // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
       // sameSite: "strict",
     });
-    
+
     // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
-    res.status(200).json({ message: "Login successful", token: token, data: user });
+    res
+      .status(200)
+      .json({
+        message: "Login successful",
+        token: token,
+        data: user,
+        role: user.role,
+      });
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    // Find the account by the decoded ID
+    const userId = await User.findById(decoded.user);
+    if (!userId) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Account not found" });
+    }
+
+    // If the account is already verified
+    if (userId.isActive) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Account already verified" });
+    }
+
+    // Set the account to verified
+    userId.isActive = true;
+    await userId.save();
+    res.redirect(`http://localhost:3001/verification-success`);
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Verification token has expired" });
+    } else if (err.name === "JsonWebTokenError") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid verification token" });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "An error occurred during verification.",
+    });
   }
 };

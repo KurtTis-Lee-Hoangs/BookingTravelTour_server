@@ -193,7 +193,7 @@ export const verifyEmail = async (req, res) => {
     // Set the account to verified
     userId.isActive = true;
     await userId.save();
-    res.redirect(`http://localhost:3001/verification-success`);
+    res.redirect(`http://localhost:3000/registration-success`);
   } catch (err) {
     if (err.name === "TokenExpiredError") {
       return res

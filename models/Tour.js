@@ -35,7 +35,10 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
+    type: {
+      type: String, 
+      enum: ["Du lịch trong nước", "Du lịch ngoài nước"]
+    },
     reviews: [
       {
         type: mongoose.Types.ObjectId,

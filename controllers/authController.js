@@ -41,6 +41,11 @@ export const register = async (req, res) => {
 // User login
 export const login = async (req, res) => {
   const email = req.body.email;
+  if (!req.body.password) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Password is required" });
+  }
 
   try {
     const user = await User.findOne({ email });
@@ -127,18 +132,18 @@ export const googleLogin = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: "1d" }
+      { expiresIn: "15d" }
     );
 
     // set token in browser cookies aand send the response to the client
     res.cookie("accessToken", token, {
       httpOnly: true,
       exprires: token.expiresIn,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "strict",
+      // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      // sameSite: "strict",
     });
     // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
-    res.status(200).json({ message: "Login successful", token: token });
+    res.status(200).json({ message: "Login successful", token: token, data: user });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import {sendEmail} from "../utils/sendEmail.js"
+import { sendEmail } from "../utils/sendEmail.js";
 
 // Create a new User
 export const createUser = async (req, res) => {
@@ -41,6 +41,7 @@ export const createUser = async (req, res) => {
 // Update a User
 export const updateUser = async (req, res) => {
   const id = req.params.id;
+  const userId = req.user
 
   // Check if password is provided in the request body
   if (req.body.password) {
@@ -52,6 +53,14 @@ export const updateUser = async (req, res) => {
   if (req.body.avatar) {
     // Optionally delete old avatar from Cloudinary (if you want)
     // cloudinary.v2.uploader.destroy(old_avatar_public_id);
+  }
+
+  const account = await User.findById(userId.id);
+  if (!account) {
+    return res.status(404).json({success: false, message: "Account not found"});
+  }
+  if (account.role === "user") {
+    delete req.body.role;
   }
 
   try {
@@ -109,7 +118,8 @@ export const getSingleUser = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       success: false,
-      message: "Not found the user. Try again",
+      // message: "Not found the user. Try again",
+      message: err.message,
     });
   }
 };
@@ -142,7 +152,9 @@ export const updateFavorites = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     if (action === "add") {
@@ -190,7 +202,6 @@ export const updateFavorites = async (req, res) => {
   }
 };
 
-
 // Get all favorites of a user
 export const getFavorites = async (req, res) => {
   const id = req.params.userId;
@@ -200,7 +211,9 @@ export const getFavorites = async (req, res) => {
     const user = await User.findById(id).populate("favorites");
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     return res.status(200).json({
@@ -244,6 +257,25 @@ export const forgotPasswordCtrl = async (req, res) => {
     res.status(500).json({
       status: "failed",
       message: "Failed to send email. Please try again later.",
+    });
+  }
+};
+
+export const SignOut = async (req, res) => {
+  try {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true, // Đảm bảo chỉ hoạt động qua HTTPS
+      sameSite: "strict", // Bảo vệ chống tấn công CSRF
+    });
+    res.status(200).json({
+      success: true,
+      message: "Successfully logged out",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };

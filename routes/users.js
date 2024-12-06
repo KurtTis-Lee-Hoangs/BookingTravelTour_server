@@ -8,7 +8,8 @@ import {
   createUser,
   updateFavorites,
   getFavorites,
-  forgotPasswordCtrl
+  forgotPasswordCtrl,
+  SignOut,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -17,7 +18,7 @@ const router = express.Router();
 router.post('/', createUser);
 
 // update a user
-router.put("/:id", verifyAdmin, updateUser);
+router.put("/:id", verifyUser, updateUser);
 // router.put("/:id", updateUser);
 
 // delete a user
@@ -35,5 +36,7 @@ router.get("/", verifyAdmin, getAllUser);
 router.patch("/:id/favorites", verifyUser, updateFavorites);
 router.get("/:userId/favorites", getFavorites);
 router.post("/forgot-password", forgotPasswordCtrl)
+router.post("/sign-out", SignOut)
+
 
 export default router;

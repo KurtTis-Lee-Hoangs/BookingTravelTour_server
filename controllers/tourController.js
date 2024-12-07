@@ -134,31 +134,6 @@ export const getAllTourByAdmin = async (req, res) => {
 
 // get tour by search
 export const getTourBySearch = async (req, res) => {
-  // // here "i" means case sensitive
-  // const city = new RegExp(req.query.city, "i");
-  // const day = parseInt(req.query.day);
-  // const maxGroupSize = parseInt(req.query.maxGroupSize);
-
-  // try {
-  //   // gte means greater than or equal
-  //   const tours = await Tour.find({
-  //     city,
-  //     day: { $gte: day },
-  //     maxGroupSize: { $gte: maxGroupSize },
-  //   }).populate("reviews");
-
-  //   res.status(200).json({
-  //     success: true,
-  //     message: "Sussessfully get tours",
-  //     data: tours,
-  //   });
-  // } catch (err) {
-  //   res.status(404).json({
-  //     success: false,
-  //     message: "Not found the tours. Try again",
-  //   });
-  // }
-
   // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
   const searchConditions = {};
 

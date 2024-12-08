@@ -3,6 +3,7 @@ import {
   register,
   login,
   googleLogin,
+  verifyEmail
 } from "../controllers/authController.js";
 // import passport from "passport";
 
@@ -15,5 +16,6 @@ router.post("/register", register);
 router.post("/login", login);
 
 router.post("/google-login", googleLogin)
+router.get("/verify-email/:token", verifyEmail);
 
 export default router;

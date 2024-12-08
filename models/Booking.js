@@ -8,6 +8,10 @@ const bookingSchema = new mongoose.Schema(
     userEmail: {
       type: String,
     },
+    tourId: {
+      type: mongoose.Types.ObjectId,
+      ref: "Tour",
+    },
     tourName: {
       type: String,
       required: true,

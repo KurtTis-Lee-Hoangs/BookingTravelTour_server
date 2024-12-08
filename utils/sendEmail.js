@@ -65,3 +65,69 @@ export const sendVerificationEmail = async (email, verificationLink) => {
   };
   await transporter.sendMail(mailOptions);
 };
+
+export const sendPaymentConfirmationEmail = async (email, bookingDetails) => {
+  const { tourName, fullName, guestSize, bookAt, totalPrice } = bookingDetails;
+  const transporter = nodemailer.createTransport({
+    service: "Gmail", // Gmail hoặc email provider khác
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_PASS,
+    },
+  });
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: "Xác nhận thanh toán thành công",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <div style="text-align: center; border-bottom: 2px solid #4caf50; padding-bottom: 10px; margin-bottom: 20px;">
+          <h1 style="color: #4caf50; margin: 0;">Thanh toán thành công</h1>
+          <p style="color: #555; margin: 0;">Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi</p>
+        </div>
+        
+        <p style="font-size: 16px; margin-bottom: 20px;">Xin chào <strong style="color: #4caf50;">${fullName}</strong>,</p>
+        <p style="font-size: 16px;">Chúng tôi rất vui thông báo rằng bạn đã thanh toán thành công cho tour du lịch của mình. Dưới đây là thông tin chi tiết:</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <tr style="background-color: #f9f9f9;">
+            <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold; width: 40%;">Tên tour</td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">${tourName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Số lượng khách</td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">${guestSize}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Ngày đi</td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">${bookAt}</td>
+          </tr>
+          <tr style="background-color: #f9f9f9;">
+            <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Tổng tiền</td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0; color: #4caf50; font-weight: bold;">${totalPrice.toLocaleString()} VNĐ</td>
+          </tr>
+        </table>
+        
+        <p style="font-size: 16px; margin-top: 20px;">Chúc bạn có một chuyến đi thật tuyệt vời và đáng nhớ! Nếu bạn cần thêm thông tin, hãy liên hệ với chúng tôi qua email này.</p>
+        
+        <div style="text-align: center; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+          <p style="font-size: 14px; color: #777;">Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi:</p>
+          <p style="font-size: 14px; margin: 5px 0;"><strong>Email:</strong> support@tourcompany.com</p>
+          <p style="font-size: 14px; margin: 5px 0;"><strong>Hotline:</strong> 1900 1234</p>
+        </div>
+        
+        <footer style="text-align: center; margin-top: 20px; font-size: 12px; color: #999;">
+          <p>© 2024 Tour Company. All rights reserved.</p>
+        </footer>
+      </div>
+    `,
+  };
+  
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Payment confirmation email sent successfully!");
+  } catch (error) {
+    console.error("Failed to send payment confirmation email:", error.message);
+    throw new Error("Failed to send email");
+  }
+};

@@ -11,7 +11,8 @@ export const createReview = async (req, res) => {
   const newReview = new Review({ ...req.body, userId: userId, tour: tourId });
 
   try {
-    const bookingExists = await Booking.findOne({ userId, tourId: tourId });
+    // const bookingExists = await Booking.findOne({ userId, tourId: tourId });
+    const bookingExists = await Booking.findOne({ userId, tourId: tourId, isPayment: true });
     if (!bookingExists) {
       return res.status(403).json({
         success: false,

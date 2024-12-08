@@ -3,26 +3,10 @@ import moment from "moment";
 import CryptoJS from "crypto-js";
 import configPayment from "../config/configPayment.js";
 import axios from "axios";
+import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
 
 // Create new booking
 export const createBooking = async (req, res) => {
-  // const newBooking = new Booking(req.body);
-
-  // try {
-  //   const savedBooking = await newBooking.save();
-  //   res.status(200).json({
-  //     success: true,
-  //     message: "Your tour is booked successfully",
-  //     data: savedBooking,
-  //   });
-  // } catch (err) {
-  //   res.status(500).json({
-  //     success: false,
-  //     message: "Thông tin nhập vào đang bị sai",
-  //   });
-  // }
-  
-
   const newBooking = new Booking(req.body);
 
   try {
@@ -159,7 +143,7 @@ export const getUserBookings = async (req, res) => {
 export const payment = async (orderId) => {
   const embed_data = {
     redirecturl: "http://localhost:3000/thankyou",
-    logourl: "https://play-lh.googleusercontent.com/woYAzPCG1I8Z8HXCsdH3diL7oly0N8uth_1g6k7R_9Gu7lbxrsYeriEXLecRG2E9rP0=w240-h480-rw",
+    // logourl: "https://play-lh.googleusercontent.com/woYAzPCG1I8Z8HXCsdH3diL7oly0N8uth_1g6k7R_9Gu7lbxrsYeriEXLecRG2E9rP0=w240-h480-rw",
   };
 
   const orderInfo = await Booking.findById(orderId);
@@ -180,7 +164,7 @@ export const payment = async (orderId) => {
     description: `Payment for the order #${transID}`,
     bank_code: "",
     callback_url:
-      "https://6316-2001-ee0-4f0c-13e0-f007-235b-9eb6-f19a.ngrok-free.app/api/v1/bookings/callback",
+      "https://65f1-14-226-221-44.ngrok-free.app/api/v1/bookings/callback",
   };
 
   const data =
@@ -235,14 +219,33 @@ export const callback = async (req, res) => {
       // merchant cập nhật trạng thái cho đơn hàng
       let dataJson = JSON.parse(dataStr, configPayment.key2);
 
-      await Booking.findOneAndUpdate(
+      // await Booking.findOneAndUpdate(
+      //   { _id: dataJson["app_user"] },
+      //   { isPayment: true }
+      // );
+
+      const booking = await Booking.findOneAndUpdate(
         { _id: dataJson["app_user"] },
-        { isPayment: true }
+        { isPayment: true },
+        { new: true }
       );
       console.log(
         "update order's status = success where app_trans_id =",
         dataJson["app_trans_id"]
       );
+
+      if (booking) {
+        try {
+          await sendPaymentConfirmationEmail(booking.userEmail, {
+            tourName: booking.tourName,
+            fullName: booking.fullName,
+            guestSize: booking.guestSize,
+            totalPrice: booking.totalPrice,
+          });
+        } catch (emailError) {
+          console.error("Failed to send email confirmation:", emailError.message);
+        }
+      }
 
       result.return_code = 1;
       result.return_message = "success";

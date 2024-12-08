@@ -8,6 +8,13 @@ import { sendVerificationEmail } from "../utils/sendEmail.js";
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
+    const existEmail = await User.findOne({email: email})
+    if (existEmail) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Email is already registered." });
+    }
+
     // if (!req.body.password) {
     if (!password) {
       return res
@@ -142,7 +149,7 @@ export const googleLogin = async (req, res) => {
   const { credential } = req.body;
   try {
     const userData = await verifyGoogleToken(credential);
-    console.log(userData);
+    // console.log(userData);
 
     const { sub: googleId, name: username, email, picture: avatar } = userData;
     let user = await User.findOne({ email });

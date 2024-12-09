@@ -74,12 +74,18 @@ export const login = async (req, res) => {
 
     // if user doesn't exist
     if (!user) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
+    if (!user.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: "Please active your account before login. Or you can contact to administrator to active account",
+      });
+    } 
     // if user is exist then check the password or compare the password
     const checkCorrectPassword = await bcrypt.compare(
       req.body.password,
@@ -147,7 +153,8 @@ export const googleLogin = async (req, res) => {
     if (!user) {
       user = await User.create({ googleId, username, email, avatar });
     }
-
+    user.isActive = true;
+    
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET_KEY,

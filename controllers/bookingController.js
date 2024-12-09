@@ -163,7 +163,7 @@ export const payment = async (orderId) => {
     description: `Payment for the order #${transID}`,
     bank_code: "",
     callback_url:
-      "https://d37a-2402-800-63a3-f0fc-4528-dc44-74b3-8732.ngrok-free.app/api/v1/bookings/callback",
+      "https://1ffa-2402-800-63a3-f0fc-3486-862-b902-1a01.ngrok-free.app/api/v1/bookings/callback",
   };
 
   const data =
@@ -235,6 +235,7 @@ export const callback = async (req, res) => {
             fullName: booking.fullName,
             guestSize: booking.guestSize,
             totalPrice: booking.totalPrice,
+            bookAt: booking.bookAt,
           });
         } catch (emailError) {
           console.error("Failed to send email confirmation:", emailError.message);

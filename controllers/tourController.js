@@ -93,8 +93,8 @@ export const getAllTourByUser = async (req, res) => {
   try {
     const tours = await Tour.find({})
       .populate("reviews")
-      .skip(page * 8)
-      .limit(8);
+      .skip(page * 16)
+      .limit(16);
 
     res.status(200).json({
       success: true,
@@ -191,10 +191,69 @@ export const getFeaturedTour = async (req, res) => {
   }
 };
 
-// get tour counts
+export const getDomesticTour = async (req, res) => {
+
+  const page = parseInt(req.query.page);
+
+  try {
+    const tours = await Tour.find({ featured: false })
+      .populate("reviews")
+      .skip(page * 8)
+      .limit(8);
+
+    res.status(200).json({
+      success: true,
+      message: "Sussessfully get featured tours",
+      count: tours.length,
+      data: tours,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Not found the tours. Try again",
+    });
+  }
+};
+
+// get tour counts with all
 export const getTourCount = async (req, res) => {
   try {
     const tourCount = await Tour.estimatedDocumentCount();
+    // const tourCount = await Tour.countDocuments({ featured: true });
+
+    res.status(200).json({
+      success: true,
+      data: tourCount,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch",
+    });
+  }
+};
+
+// get tour counts with ForeignTours
+export const getForeignToursCount = async (req, res) => {
+  try {
+    const tourCount = await Tour.countDocuments({ featured: true });
+
+    res.status(200).json({
+      success: true,
+      data: tourCount,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch",
+    });
+  }
+};
+
+// get tour counts with DomesticTours
+export const getDomesticToursCount = async (req, res) => {
+  try {
+    const tourCount = await Tour.countDocuments({ featured: false });
 
     res.status(200).json({
       success: true,

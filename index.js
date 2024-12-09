@@ -8,7 +8,7 @@ import userRoute from "./routes/users.js";
 import authRoute from "./routes/auth.js";
 import reviewRoute from "./routes/reviews.js";
 import bookingRoute from "./routes/bookings.js";
-import postRoute from "./routes/posts.js";
+import blogRoute from "./routes/blogs.js";
 import servicesRoute from "./routes/services.js"
 import cloudinary from "cloudinary";
 
@@ -55,7 +55,7 @@ app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/bookings", bookingRoute);
-app.use("/api/v1/posts", postRoute);
+app.use("/api/v1/blogs", blogRoute);
 app.use("/api/v1/services", servicesRoute);
 
 app.listen(port, () => {

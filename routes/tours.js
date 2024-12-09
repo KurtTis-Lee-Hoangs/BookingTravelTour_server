@@ -9,6 +9,9 @@ import {
   getTourBySearch,
   getFeaturedTour,
   getTourCount,
+  getDomesticTour,
+  getForeignToursCount,
+  getDomesticToursCount,
 } from "../controllers/tourController.js";
 
 import { verifyAdmin, verifyUser } from "../utils/verifyToken.js";
@@ -38,8 +41,11 @@ router.get("/search/getTourBySearch", getTourBySearch);
 
 // get featured tour
 router.get("/search/getFeaturedTours", getFeaturedTour);
+router.get("/search/getDomesticTours", getDomesticTour);
 
 // get tour counts
 router.get("/search/getTourCount", getTourCount);
+router.get("/search/getForeignToursCount", getForeignToursCount);
+router.get("/search/getDomesticToursCount", getDomesticToursCount);
 
 export default router;

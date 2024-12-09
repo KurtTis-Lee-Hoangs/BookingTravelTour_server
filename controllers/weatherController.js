@@ -14,7 +14,7 @@ export const weatherAPI = async (req, res) => {
         q: location, // Sử dụng tên location đã kết hợp
         appid: process.env.API_WEATHER_KEY,
         units: "metric", // Đơn vị: Celsius
-        cnt: 7, // Lấy thông tin thời tiết trong 7 ngày
+        cnt: 21, // Lấy thông tin thời tiết trong 7 ngày
       },
     });
     // Lọc và trả về dữ liệu thời tiết trong tuần

@@ -3,7 +3,7 @@ import {
   register,
   login,
   googleLogin,
-  verifyEmail,
+  verifyEmail
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -14,7 +14,7 @@ router.post("/register", register);
 // Login
 router.post("/login", login);
 
-router.post("/google-login", googleLogin);
+router.post("/google-login", googleLogin)
 router.get("/verify-email/:token", verifyEmail);
 
 export default router;

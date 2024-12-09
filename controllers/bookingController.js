@@ -4,6 +4,7 @@ import CryptoJS from "crypto-js";
 import configPayment from "../config/configPayment.js";
 import axios from "axios";
 import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
+import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
 
 // Create new booking
 export const createBooking = async (req, res) => {
@@ -163,7 +164,7 @@ export const payment = async (orderId) => {
     description: `Payment for the order #${transID}`,
     bank_code: "",
     callback_url:
-      "https://1ffa-2402-800-63a3-f0fc-3486-862-b902-1a01.ngrok-free.app/api/v1/bookings/callback",
+      "https://6316-2001-ee0-4f0c-13e0-f007-235b-9eb6-f19a.ngrok-free.app/api/v1/bookings/callback",
   };
 
   const data =

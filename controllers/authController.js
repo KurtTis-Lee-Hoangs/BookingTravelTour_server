@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { verifyGoogleToken } from "../utils/verifyToken.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
+import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 // User registrantion
 export const register = async (req, res) => {
@@ -168,7 +169,6 @@ export const googleLogin = async (req, res) => {
       // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
       // sameSite: "strict",
     });
-
     // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
     res.status(200).json({
       message: "Login successful",

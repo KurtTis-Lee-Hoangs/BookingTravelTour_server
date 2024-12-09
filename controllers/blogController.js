@@ -1,30 +1,30 @@
-import Post from "../models/Post.js";
+import Blog from "../models/Blog.js";
 
-// Create new post or tip
-export const createPost = async (req, res) => {
-  const newPost = new Post(req.body);
+// Create new blog or tip
+export const createBlog = async (req, res) => {
+  const newBlog = new Blog(req.body);
 
   try {
-    const savedPost = await newPost.save();
+    const savedBlog = await newBlog.save();
     res.status(200).json({
       success: true,
-      message: "Create post successfully",
-      data: savedPost,
+      message: "Create blog successfully",
+      data: savedBlog,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Create post failed",
+      message: "Create blog failed",
     });
   }
 };
 
-// Update a post
-export const updatePost = async (req, res) => {
+// Update a blog
+export const updateBlog = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const updatedPost = await Post.findByIdAndUpdate(
+    const updatedBlog = await Blog.findByIdAndUpdate(
       id,
       {
         $set: req.body,
@@ -34,71 +34,71 @@ export const updatePost = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Sussessfully updated the post",
-      data: updatedPost,
+      message: "Sussessfully updated the blog",
+      data: updatedBlog,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Failed update a post. Try again",
+      message: "Failed update a blog. Try again",
     });
   }
 };
 
-// Delete a post
-export const deletePost = async (req, res) => {
+// Delete a blog
+export const deleteBlog = async (req, res) => {
   const id = req.params.id;
 
   try {
-    await Post.findByIdAndDelete(id);
+    await Blog.findByIdAndDelete(id);
 
     res.status(200).json({
       success: true,
-      message: "Sussessfully delete the post",
+      message: "Sussessfully delete the blog",
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Failed delete a post. Try again",
+      message: "Failed delete a blog. Try again",
     });
   }
 };
 
-// Get single post or tip
-export const getSinglePost = async (req, res) => {
+// Get single blog or tip
+export const getSingleBlog = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const post = await Post.findById(id);
+    const blog = await Blog.findById(id);
 
     res.status(200).json({
       success: true,
-      message: "Get post successfully",
-      data: post,
+      message: "Get blog successfully",
+      data: blog,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Get post failed. Not found post",
+      message: "Get blog failed. Not found blog",
     });
   }
 };
 
-// Get all post or tip
-export const getAllPostByUser = async (req, res) => {
+// Get all blog or tip
+export const getAllBlogByUser = async (req, res) => {
   // pagianaion
   const page = parseInt(req.query.page);
 
   try {
-    const posts = await Post.find({})
+    const blogs = await Blog.find({})
       .skip(page * 8)
       .limit(8);
 
     res.status(200).json({
       success: true,
-      count: posts.length,
+      count: blogs.length,
       message: "Sussessfully get all tours",
-      data: posts,
+      data: blogs,
     });
   } catch (err) {
     res.status(404).json({
@@ -108,33 +108,33 @@ export const getAllPostByUser = async (req, res) => {
   }
 };
 
-// Get all post by admin
-export const getAllPostByAdmin = async (req, res) => {
+// Get all blog by admin
+export const getAllBlogByAdmin = async (req, res) => {
   try {
-    const posts = await Post.find({});
+    const blogs = await Blog.find({})
 
     res.status(200).json({
       success: true,
-      count: posts.length,
-      message: "Sussessfully get all posts",
-      data: posts,
+      count: blogs.length,
+      message: "Sussessfully get all blogs",
+      data: blogs,
     });
   } catch (err) {
     res.status(404).json({
       success: false,
-      message: "Not found the post. Try again",
+      message: "Not found the blog. Try again",
     });
   }
 };
 
-// get post counts
-export const getPostCount = async (req, res) => {
+// get blog counts
+export const getBlogCount = async (req, res) => {
   try {
-    const postCount = await Post.estimatedDocumentCount();
+    const blogCount = await Blog.estimatedDocumentCount();
 
     res.status(200).json({
       success: true,
-      data: postCount,
+      data: blogCount,
     });
   } catch (err) {
     res.status(500).json({
@@ -144,8 +144,8 @@ export const getPostCount = async (req, res) => {
   }
 };
 
-// get post by search
-export const getPostBySearch = async (req, res) => {
+// get blog by search
+export const getBlogBySearch = async (req, res) => {
   // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
   const searchConditions = {};
 
@@ -156,17 +156,17 @@ export const getPostBySearch = async (req, res) => {
 
   try {
     // Thực hiện tìm kiếm với các điều kiện đã xây dựng
-    const posts = await Post.find(searchConditions);
+    const blogs = await Blog.find(searchConditions);
 
     res.status(200).json({
       success: true,
-      message: "Successfully retrieved tours",
-      data: posts,
+      message: "Successfully retrieved blogs",
+      data: blogs,
     });
   } catch (err) {
     res.status(404).json({
       success: false,
-      message: "Could not find tours. Please try again.",
+      message: "Could not find blogs. Please try again.",
     });
   }
 };

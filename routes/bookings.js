@@ -6,8 +6,8 @@ import {
   getBooking,
   getAllBooking,
   getUserBookings,
-  callback,
 } from "../controllers/bookingController.js";
+import { callback } from "../controllers/paymentController.js";
 import { verifyUser, verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();

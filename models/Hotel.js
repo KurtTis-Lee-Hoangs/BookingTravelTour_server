@@ -23,7 +23,7 @@ const hotelSchema = new mongoose.Schema(
     photo: {
       type: String,
     },
-    active: {
+    isActive: {
       type: Boolean,
       default: true,
     }

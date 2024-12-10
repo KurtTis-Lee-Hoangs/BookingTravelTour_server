@@ -3,11 +3,13 @@ import express from "express";
 const router = express.Router();
 import {
   createHotel,
+  createHotelBooking,
   deleteHotel,
   getAllHotel,
   getHotelCount,
   getSingleHotel,
   updateHotel,
+  updateHotelRoom,
 } from "../controllers/hotelController.js";
 
 import {
@@ -24,11 +26,12 @@ router.post("/", createHotel);
 router.put("/:id", updateHotel)
 router.delete("/:id", deleteHotel);
 
-router.post("/")
+router.post("/payment", createHotelBooking)
 
 router.get("/rooms/:id", getAllHotelRoom);
 router.get("/room/:id", getSingleHotelRoom);
 router.post("/room", createHotelRoom);
+router.put("/room/:id", updateHotelRoom)
 router.delete("/room/:id", deleteHotelRoom);
 
 export default router;

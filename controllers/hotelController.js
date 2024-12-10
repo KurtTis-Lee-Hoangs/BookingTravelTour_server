@@ -1,39 +1,54 @@
 import Hotel from "../models/Hotel.js";
 import HotelRoom from "../models/HotelRoom.js";
 import BookingHotel from "../models/BookingHotel.js";
+import { payment } from "./paymentController.js";
 
 // Đặt phòng
 export const createHotelBooking = async (req, res) => {
   try {
-    const { userId, roomId, checkInDate, checkOutDate } = req.body;
+    const {userId, hotelRoomId, checkInDate, checkOutDate, paymentMethod } = req.body;
 
     // Kiểm tra phòng
-    const room = await Hotel.findById(roomId);
+    const room = await HotelRoom.findById(hotelRoomId);
     if (!room || room.status !== "Available") {
-      return res.status(400).json({ message: "Phòng không khả dụng" });
+      return res.status(400).json({ message: "Room is not available" });
     }
-
+    console.log(room)
     // Tính tổng giá
     const nights = Math.ceil(
       (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24)
     );
-    const totalPrice = room.pricePerNight * nights;
+    const totalPrice = room.price * nights;
 
     // Tạo booking
-    const booking = new BookingHotel({
+    const newBooking = new BookingHotel({
+      hotelRoomId,
       userId,
-      roomId,
       checkInDate,
       checkOutDate,
       totalPrice,
+      paymentMethod,
+      status: "Pending",
     });
-    await booking.save();
+    await newBooking.save();
 
-    // Cập nhật trạng thái phòng
-    room.status = "Booked";
-    await room.save();
+    if (paymentMethod === "ZaloPay") {
+      const paymentUrl = await payment(newBooking._id, "roomBooking");
+      if (!paymentUrl) {
+        return res.status(503).json({
+          success: false,
+          message: "Payment creation failed.",
+        });
+      }
+      // Trả về URL để frontend xử lý việc chuyển hướng
+      res.status(200).json({
+        success: true,
+        message: "Booking created successfully",
+        tour: newBooking,
+        paymentUrl: paymentUrl,
+      });
+    }
 
-    res.status(201).json({ message: "Đặt phòng thành công", booking });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
   }
@@ -43,7 +58,7 @@ export const createHotelBooking = async (req, res) => {
 export const getUserBookings = async (req, res) => {
   try {
     const userId = req.user.id; // lấy từ token
-    const bookings = await BookingHotel.find({ userId }).populate("roomId");
+    const bookings = await BookingHotel.find({ userId }).populate("hotelRoomId");
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
@@ -158,7 +173,7 @@ export const getSingleHotelRoom = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const tour = await HotelRoom.findOne({ hotelId: id });
+    const tour = await HotelRoom.findById(id);
 
     res.status(200).json({
       success: true,

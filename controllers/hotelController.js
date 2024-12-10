@@ -6,19 +6,17 @@ import { payment } from "./paymentController.js";
 // Đặt phòng
 export const createHotelBooking = async (req, res) => {
   try {
-    const {userId, hotelRoomId, checkInDate, checkOutDate, paymentMethod } = req.body;
+    const {userId, hotelRoomId, checkInDate, checkOutDate, paymentMethod, totalPrice } = req.body;
 
     // Kiểm tra phòng
     const room = await HotelRoom.findById(hotelRoomId);
     if (!room || room.status !== "Available") {
       return res.status(400).json({ message: "Room is not available" });
     }
-    console.log(room)
     // Tính tổng giá
     const nights = Math.ceil(
       (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24)
     );
-    const totalPrice = room.price * nights;
 
     // Tạo booking
     const newBooking = new BookingHotel({
@@ -48,7 +46,7 @@ export const createHotelBooking = async (req, res) => {
         paymentUrl: paymentUrl,
       });
     }
-
+    // return res.status(200).json({success: true, message: "Ok", data: newBooking})
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
   }

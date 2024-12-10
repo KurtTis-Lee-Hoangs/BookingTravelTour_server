@@ -67,7 +67,16 @@ export const sendVerificationEmail = async (email, verificationLink) => {
 };
 
 export const sendPaymentConfirmationEmail = async (email, bookingDetails) => {
-  const { tourName, fullName, guestSize, bookAt, totalPrice } = bookingDetails;
+  // const { tourName, fullName, guestSize, bookAt, totalPrice } = bookingDetails;
+
+  const { tourName, fullName, guestSize, totalPrice, bookAt } = bookingDetails;
+  // Định dạng ngày
+  const formattedBookAt = new Date(bookAt).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
   const transporter = nodemailer.createTransport({
     service: "Gmail", // Gmail hoặc email provider khác
     auth: {
@@ -106,6 +115,10 @@ export const sendPaymentConfirmationEmail = async (email, bookingDetails) => {
             <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Tổng tiền</td>
             <td style="padding: 10px; border: 1px solid #e0e0e0; color: #4caf50; font-weight: bold;">${totalPrice.toLocaleString()} VNĐ</td>
           </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Ngày đi</td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">${formattedBookAt}</td>
+          </tr>s
         </table>
         
         <p style="font-size: 16px; margin-top: 20px;">Chúc bạn có một chuyến đi thật tuyệt vời và đáng nhớ! Nếu bạn cần thêm thông tin, hãy liên hệ với chúng tôi qua email này.</p>

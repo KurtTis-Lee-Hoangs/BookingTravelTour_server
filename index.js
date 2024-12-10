@@ -10,6 +10,7 @@ import reviewRoute from "./routes/reviews.js";
 import bookingRoute from "./routes/bookings.js";
 import blogRoute from "./routes/blogs.js";
 import servicesRoute from "./routes/services.js"
+import hotelRoute from "./routes/hotel.js"
 import cloudinary from "cloudinary";
 
 dotenv.config();
@@ -57,6 +58,7 @@ app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/bookings", bookingRoute);
 app.use("/api/v1/blogs", blogRoute);
 app.use("/api/v1/services", servicesRoute);
+app.use("/api/v1/hotels", hotelRoute)
 
 app.listen(port, () => {
   conect();

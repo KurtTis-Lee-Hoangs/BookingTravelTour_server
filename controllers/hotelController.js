@@ -1,22 +1,25 @@
 import Hotel from "../models/Hotel.js";
 import HotelRoom from "../models/HotelRoom.js";
 import BookingHotel from "../models/BookingHotel.js";
-import { payment } from "./paymentController.js";
+import { paymentZalopay, paymentVnpay } from "./paymentController.js";
 
 // Đặt phòng
 export const createHotelBooking = async (req, res) => {
   try {
-    const {userId, hotelRoomId, checkInDate, checkOutDate, paymentMethod, totalPrice } = req.body;
+    const {
+      userId,
+      hotelRoomId,
+      checkInDate,
+      checkOutDate,
+      paymentMethod,
+      totalPrice,
+    } = req.body;
 
     // Kiểm tra phòng
     const room = await HotelRoom.findById(hotelRoomId);
     if (!room || room.status !== "Available") {
       return res.status(400).json({ message: "Room is not available" });
     }
-    // Tính tổng giá
-    const nights = Math.ceil(
-      (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24)
-    );
 
     // Tạo booking
     const newBooking = new BookingHotel({
@@ -27,11 +30,13 @@ export const createHotelBooking = async (req, res) => {
       totalPrice,
       paymentMethod,
       status: "Pending",
+      typeBooking: "hotel",
     });
     await newBooking.save();
 
+    let paymentUrl;
     if (paymentMethod === "ZaloPay") {
-      const paymentUrl = await payment(newBooking._id, "roomBooking");
+      paymentUrl = await paymentZalopay(newBooking._id, newBooking.typeBooking);
       if (!paymentUrl) {
         return res.status(503).json({
           success: false,
@@ -39,14 +44,36 @@ export const createHotelBooking = async (req, res) => {
         });
       }
       // Trả về URL để frontend xử lý việc chuyển hướng
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Booking created successfully",
-        tour: newBooking,
+        order: newBooking,
         paymentUrl: paymentUrl,
       });
     }
-    // return res.status(200).json({success: true, message: "Ok", data: newBooking})
+
+    if (paymentMethod === "VNPay") {
+      paymentUrl = await paymentVnpay(
+        newBooking._id,
+        newBooking.typeBooking,
+        req,
+        res
+      );
+      if (!paymentUrl) {
+        return res.status(503).json({
+          success: false,
+          message: "Payment creation failed.",
+        });
+      }
+      // Trả về URL để frontend xử lý việc chuyển hướng
+      return res.status(200).json({
+        success: true,
+        message: "Booking created successfully",
+        order: newBooking,
+        paymentUrl: paymentUrl,
+      });
+    }
+    res.status(200).json({ success: true });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
   }
@@ -55,9 +82,14 @@ export const createHotelBooking = async (req, res) => {
 // Xem danh sách phòng đã đặt
 export const getUserBookings = async (req, res) => {
   try {
-    const userId = req.user.id; // lấy từ token
-    const bookings = await BookingHotel.find({ userId }).populate("hotelRoomId");
-    res.status(200).json(bookings);
+    const id = req.params.id;
+    const bookings = await BookingHotel.find({ userId: id });
+    res.status(200).json({
+      success: true,
+      message: "Get booking history successfully",
+      count: bookings.length,
+      data: bookings,
+    });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
   }
@@ -92,7 +124,7 @@ export const getAllHotelRoom = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const hotelRooms = await HotelRoom.find({hotelId: id})
+    const hotelRooms = await HotelRoom.find({ hotelId: id })
       .skip(page * 8)
       .limit(8);
 
@@ -256,7 +288,7 @@ export const deleteHotel = async (req, res) => {
   const id = req.params.id;
 
   try {
-    await Hotel.findByIdAndUpdate(id, {active: false});
+    await Hotel.findByIdAndUpdate(id, { active: false });
 
     res.status(200).json({
       success: true,
@@ -274,7 +306,7 @@ export const deleteHotelRoom = async (req, res) => {
   const id = req.params.id;
 
   try {
-    await HotelRoom.findByIdAndUpdate(id, {status: "Unavailable"});
+    await HotelRoom.findByIdAndUpdate(id, { status: "Unavailable" });
 
     res.status(200).json({
       success: true,

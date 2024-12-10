@@ -63,6 +63,7 @@ export const updateUser = async (req, res) => {
   }
   if (account.role === "user") {
     delete req.body.role;
+    delete req.body.isActive;
   }
 
   try {

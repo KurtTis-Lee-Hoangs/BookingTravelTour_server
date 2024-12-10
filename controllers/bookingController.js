@@ -1,22 +1,81 @@
 import Booking from "../models/Booking.js";
-import { payment } from "./paymentController.js";
+import { paymentZalopay } from "./paymentController.js";
 
 // Create new booking
 export const createBooking = async (req, res) => {
-  const newBooking = new Booking(req.body);
+  const {
+    userId,
+    userEmail,
+    tourId,
+    tourName,
+    fullName,
+    guestSize,
+    phone,
+    bookAt,
+    totalPrice,
+  } = req.body;
+  const newBooking = new Booking({
+    userId,
+    userEmail,
+    tourId,
+    tourName,
+    fullName,
+    guestSize,
+    phone,
+    bookAt,
+    totalPrice,
+    typeBooking: "tour",
+  });
 
   try {
     const savedBooking = await newBooking.save();
 
-    const paymentUrl = await payment(savedBooking._id, "tourBooking");
-    if (!paymentUrl) {
-      return res.status(503).json({
-        success: false,
-        message: "Payment creation failed.",
+    let paymentUrl;
+    if (paymentMethod === "ZaloPay") {
+      paymentUrl = await paymentZalopay(
+        savedBooking._id,
+        savedBooking.typeBooking
+      );
+      console.log(savedBooking._id);
+      if (!paymentUrl) {
+        return res.status(503).json({
+          success: false,
+          message: "Payment creation failed.",
+        });
+      }
+      // Trả về URL để frontend xử lý việc chuyển hướng
+      return res.status(200).json({
+        success: true,
+        message: "Booking created successfully",
+        order: savedBooking,
+        paymentUrl: paymentUrl,
       });
     }
 
+    if (paymentMethod === "VNPay") {
+      paymentUrl = await paymentVnpay(
+        savedBooking._id,
+        savedBooking.typeBooking,
+        req,
+        res
+      );
+      console.log(savedBooking._id);
+      if (!paymentUrl) {
+        return res.status(503).json({
+          success: false,
+          message: "Payment creation failed.",
+        });
+      }
+      // Trả về URL để frontend xử lý việc chuyển hướng
+      return res.status(200).json({
+        success: true,
+        message: "Booking created successfully",
+        order: savedBooking,
+        paymentUrl: paymentUrl,
+      });
+    }
     // Trả về URL để frontend xử lý việc chuyển hướng
+
     res.status(200).json({
       success: true,
       message: "Booking created successfully",

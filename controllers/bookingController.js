@@ -4,7 +4,6 @@ import CryptoJS from "crypto-js";
 import configPayment from "../config/configPayment.js";
 import axios from "axios";
 import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
-import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
 
 // Create new booking
 export const createBooking = async (req, res) => {

@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { verifyGoogleToken } from "../utils/verifyToken.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
-import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 // User registrantion
 export const register = async (req, res) => {

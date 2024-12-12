@@ -7,6 +7,7 @@ import {
   deleteHotel,
   getAllHotel,
   getHotelCount,
+  getHotelRoomCount,
   getSingleHotel,
   getUserBookings,
   updateHotel,
@@ -28,13 +29,13 @@ router.post("/", createHotel);
 router.put("/:id", updateHotel)
 router.delete("/:id", deleteHotel);
 
-router.post("/payment", createHotelBooking)
-
 router.get("/history/:id", getUserBookings)
+router.post("/payment", createHotelBooking)
 router.get("/payment/vnpay_return", vnpayReturn)
 
 router.get("/rooms/:id", getAllHotelRoom);
 router.get("/room/:id", getSingleHotelRoom);
+router.get("/room/search/getHotelRoomCount", getHotelRoomCount)
 router.post("/room", createHotelRoom);
 router.put("/room/:id", updateHotelRoom)
 router.delete("/room/:id", deleteHotelRoom);

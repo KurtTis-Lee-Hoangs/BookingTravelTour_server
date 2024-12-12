@@ -8,6 +8,7 @@ import configVnpay from "../config/configVnpay.js";
 import axios from "axios";
 import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
 import BookingHotel from "../models/BookingHotel.js";
+import HotelRoom from "../models/HotelRoom.js";
 
 export const paymentZalopay = async (orderId, type) => {
   const embed_data = {
@@ -97,11 +98,11 @@ export const callback = async (req, res) => {
       let dataJson = JSON.parse(dataStr, configZalopay.key2);
       const { type } = JSON.parse(dataJson.embed_data);
       let booking;
-      console.log(type)
+
       if (type === "hotel") {
         booking = await BookingHotel.findOneAndUpdate(
           { _id: dataJson["app_user"] },
-          { isPayment: true },
+          { isPayment: true, availableRooms: booking.availableRooms - 1 },
           { new: true }
         );
       } else if (type === "tour") {
@@ -259,7 +260,17 @@ export const vnpayReturn = async (req, res, next) => {
       if (orderInfo && orderInfo.typeBooking === "hotel") {
         orderInfo.isPayment = true;
         await orderInfo.save();
-        return res.redirect("http://localhost:3000/thankyou");
+
+        const room = await HotelRoom.findById(orderInfo.hotelRoomId);
+        if (room && room.availableRooms > 0) {
+          room.availableRooms -= 1; // Giảm số lượng phòng
+          await room.save();
+          return res.redirect("http://localhost:3000/thankyou");
+        } else {
+          return res.status(400).json({
+            message: "Room not available or already fully booked.",
+          });
+        }
       }
 
       orderInfo = await Booking.findById(orderId);

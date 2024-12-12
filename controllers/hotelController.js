@@ -17,7 +17,7 @@ export const createHotelBooking = async (req, res) => {
 
     // Kiểm tra phòng
     const room = await HotelRoom.findById(hotelRoomId);
-    if (!room || room.status !== "Available") {
+    if (!room || room.availableRooms === 0) {
       return res.status(400).json({ message: "Room is not available" });
     }
 
@@ -275,6 +275,22 @@ export const getHotelCount = async (req, res) => {
     res.status(200).json({
       success: true,
       data: hotelCount,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch",
+    });
+  }
+};
+
+export const getHotelRoomCount = async (req, res) => {
+  try {
+    const hotelRoomCount = await HotelRoom.estimatedDocumentCount();
+
+    res.status(200).json({
+      success: true,
+      data: hotelRoomCount,
     });
   } catch (err) {
     res.status(500).json({

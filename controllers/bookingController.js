@@ -36,7 +36,6 @@ export const createBooking = async (req, res) => {
         savedBooking._id,
         savedBooking.typeBooking
       );
-      console.log(savedBooking._id);
       if (!paymentUrl) {
         return res.status(503).json({
           success: false,
@@ -59,7 +58,6 @@ export const createBooking = async (req, res) => {
         req,
         res
       );
-      console.log(savedBooking._id);
       if (!paymentUrl) {
         return res.status(503).json({
           success: false,

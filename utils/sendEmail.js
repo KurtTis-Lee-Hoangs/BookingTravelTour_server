@@ -109,24 +109,20 @@ export const sendPaymentConfirmationEmail = async (email, bookingDetails) => {
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Ngày đi</td>
-            <td style="padding: 10px; border: 1px solid #e0e0e0;">${bookAt}</td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">${formattedBookAt}</td>
           </tr>
           <tr style="background-color: #f9f9f9;">
             <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Tổng tiền</td>
             <td style="padding: 10px; border: 1px solid #e0e0e0; color: #4caf50; font-weight: bold;">${totalPrice.toLocaleString()} VNĐ</td>
           </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Ngày đi</td>
-            <td style="padding: 10px; border: 1px solid #e0e0e0;">${formattedBookAt}</td>
-          </tr>s
         </table>
         
         <p style="font-size: 16px; margin-top: 20px;">Chúc bạn có một chuyến đi thật tuyệt vời và đáng nhớ! Nếu bạn cần thêm thông tin, hãy liên hệ với chúng tôi qua email này.</p>
         
         <div style="text-align: center; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 20px;">
           <p style="font-size: 14px; color: #777;">Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi:</p>
-          <p style="font-size: 14px; margin: 5px 0;"><strong>Email:</strong> support@tourcompany.com</p>
-          <p style="font-size: 14px; margin: 5px 0;"><strong>Hotline:</strong> 1900 1234</p>
+          <p style="font-size: 14px; margin: 5px 0;"><strong>Email:</strong> minhhoangle031211@gmail.com</p>
+          <p style="font-size: 14px; margin: 5px 0;"><strong>Hotline:</strong> 0386343954</p>
         </div>
         
         <footer style="text-align: center; margin-top: 20px; font-size: 12px; color: #999;">

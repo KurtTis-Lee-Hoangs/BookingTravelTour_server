@@ -5,7 +5,8 @@ import {
   deleteTour,
   getSingleTour,
   getAllTourByUser,
-  getAllTourByAdmin,
+  getAllTourByAdminNoDelete,
+  getAllTourByAdminDeleted,
   getTourBySearch,
   getFeaturedTour,
   getTourCount,
@@ -34,7 +35,8 @@ router.get("/:id", getSingleTour);
 router.get("/user/getAllTourByUser", getAllTourByUser);
 
 // get all tours admin
-router.get("/", verifyAdmin, getAllTourByAdmin);
+router.get("/", verifyAdmin, getAllTourByAdminNoDelete);
+router.get("/delete/getAllTourByAdminDeleted", verifyAdmin, getAllTourByAdminDeleted);
 
 // get tour by search
 router.get("/search/getTourBySearch", getTourBySearch);

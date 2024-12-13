@@ -4,7 +4,8 @@ import {
   updateUser,
   deleteUser,
   getSingleUser,
-  getAllUser,
+  getAllUserNoDelete,
+  getAllUserDeleted,
   createUser,
   updateFavorites,
   getFavorites,
@@ -29,7 +30,8 @@ router.delete("/:id", verifyAdmin, deleteUser);
 router.get("/:id", verifyUser, getSingleUser);
 
 // get all users
-router.get("/", verifyAdmin, getAllUser);
+router.get("/", verifyAdmin, getAllUserNoDelete);
+router.get("/delete/getAllUserDeleted", verifyAdmin, getAllUserDeleted);
 // router.get("/" , getAllUser);
 
 // Route to handle adding/removing from favorites

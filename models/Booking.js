@@ -39,6 +39,7 @@ const bookingSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isDelete: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

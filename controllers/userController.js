@@ -5,13 +5,20 @@ import { sendEmail } from "../utils/sendEmail.js";
 // Create a new User
 export const createUser = async (req, res) => {
   const { username, email, password, role } = req.body;
-
-  // Check if the user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
+  // Check if the username already exists
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
     return res
       .status(400)
-      .json({ success: false, message: "User already exists!" });
+      .json({ success: false, message: "Username already exists!" });
+  }
+
+  // Check if the email already exists
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Email already exists!" });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,21 +90,31 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// Delete a User
 export const deleteUser = async (req, res) => {
   const id = req.params.id;
 
   try {
-    await User.findByIdAndDelete(id);
+    const user = await User.findByIdAndUpdate(
+      id,
+      { isDelete: true }, // Cập nhật thuộc tính isDelete
+      { new: true } // Trả về user đã được cập nhật
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     res.status(200).json({
       success: true,
-      message: "Sussessfully delete the user",
+      message: "User has been marked as deleted",
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Failed delete a user. Try again",
+      message: "Failed to mark user as deleted. Try again",
     });
   }
 };
@@ -125,9 +142,29 @@ export const getSingleUser = async (req, res) => {
 };
 
 // Get all User
-export const getAllUser = async (req, res) => {
+export const getAllUserNoDelete = async (req, res) => {
   try {
-    const users = await User.find({});
+    // const users = await User.find({});
+    const users = await User.find({ isDelete: false });
+
+    res.status(200).json({
+      success: true,
+      message: "Sussessfully get all users",
+      count: users.length,
+      data: users,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Not found the users. Try again",
+    });
+  }
+};
+
+export const getAllUserDeleted = async (req, res) => {
+  try {
+    // const users = await User.find({});
+    const users = await User.find({ isDelete: true });
 
     res.status(200).json({
       success: true,

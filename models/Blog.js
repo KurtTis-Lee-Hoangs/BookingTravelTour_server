@@ -14,6 +14,7 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isDelete: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -7,38 +7,110 @@ import { sendVerificationEmail } from "../utils/sendEmail.js";
 // User registrantion
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
+  // try {
+  //   const existEmail = await User.findOne({email: email})
+  //   if (existEmail) {
+  //     return res
+  //       .status(401)
+  //       .json({ success: false, message: "Email is already registered." });
+  //   }
+
+  //   // if (!req.body.password) {
+  //   if (!password) {
+  //     return res
+  //       .status(401)
+  //       .json({ success: false, message: "Password is required" });
+  //   }
+
+  //   // hasing password
+  //   const salt = await bcrypt.genSaltSync(10);
+  //   // const hash = bcrypt.hashSync(req.body.password, salt);
+  //   const hash = bcrypt.hashSync(password, salt);
+
+  //   const newUser = new User({
+  //     // username: req.body.username,
+  //     // email: req.body.email,
+  //     username,
+  //     email,
+  //     password: hash,
+  //     //   password: req.body.password,
+  //     photo: req.body.photo,
+  //   });
+
+  //   await newUser.save();
+
+  //   const verificationToken = jwt.sign(
+  //     { user: newUser._id },
+  //     process.env.JWT_SECRET_KEY,
+  //     { expiresIn: "1h" }
+  //   );
+
+  //   // Generate the verification link
+  //   const verificationLink = `${req.protocol}://${req.get(
+  //     "host"
+  //   )}/api/v1/auth/verify-email/${verificationToken}`;
+  //   // Send the verification email
+  //   await sendVerificationEmail(email, verificationLink);
+
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "Successfully created. User registered successfully",
+  //     message:
+  //       "Account registered successfully! Please verify your email to activate your account.",
+  //   });
+  // } catch (err) {
+  //   res.status(500).json({
+  //     success: false,
+  //     // message: "Failed to create. User registration failed. Try again",
+  //     message: err.message,
+  //   });
+  // }
+
   try {
-    const existEmail = await User.findOne({email: email})
-    if (existEmail) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Email is already registered." });
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email: email });
+
+    if (existingUser) {
+      if (existingUser.isDelete) {
+        // If the user is deleted, update their information
+        existingUser.username = username;
+        existingUser.password = await bcrypt.hash(password, 10);
+        existingUser.photo = req.body.photo;
+        existingUser.isDelete = false; // Mark the user as not deleted
+
+        await existingUser.save();
+        return res.status(200).json({
+          success: true,
+          message: "Successfully created. User registered successfully!",
+        });
+      } else {
+        return res
+          .status(401)
+          .json({ success: false, message: "Email is already registered." });
+      }
     }
 
-    // if (!req.body.password) {
+    // If the email does not exist, proceed with registration
     if (!password) {
       return res
         .status(401)
         .json({ success: false, message: "Password is required" });
     }
 
-    // hasing password
+    // Hash password
     const salt = await bcrypt.genSaltSync(10);
-    // const hash = bcrypt.hashSync(req.body.password, salt);
     const hash = bcrypt.hashSync(password, salt);
 
     const newUser = new User({
-      // username: req.body.username,
-      // email: req.body.email,
       username,
       email,
       password: hash,
-      //   password: req.body.password,
       photo: req.body.photo,
     });
 
     await newUser.save();
 
+    // Generate verification token
     const verificationToken = jwt.sign(
       { user: newUser._id },
       process.env.JWT_SECRET_KEY,
@@ -49,19 +121,17 @@ export const register = async (req, res) => {
     const verificationLink = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/auth/verify-email/${verificationToken}`;
-    // Send the verification email
+    
+    // Send verification email
     await sendVerificationEmail(email, verificationLink);
 
     res.status(200).json({
       success: true,
-      message: "Successfully created. User registered successfully",
-      message:
-        "Account registered successfully! Please verify your email to activate your account.",
+      message: "Account registered successfully! Please verify your email to activate your account.",
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      // message: "Failed to create. User registration failed. Try again",
       message: err.message,
     });
   }
@@ -84,6 +154,13 @@ export const login = async (req, res) => {
       res.status(404).json({
         success: false,
         message: "User not found",
+      });
+    }
+
+    if (user.isDelete) {
+      return res.status(403).json({
+        success: false,
+        message: "This account has been deleted",
       });
     }
 

@@ -78,7 +78,9 @@ export const getUserBookings = async (req, res) => {
     const userId = req.user.id; // Lấy userId từ token
 
     // Truy vấn danh sách booking theo userId và populate thông tin hotelRoomId
-    const bookings = await BookingHotel.find({ userId }).populate("hotelRoomId");
+    const bookings = await BookingHotel.find({ userId }).populate(
+      "hotelRoomId"
+    );
 
     // Trả về danh sách booking
     res.status(200).json({
@@ -116,7 +118,7 @@ export const getAllHotelByAdmin = async (req, res) => {
   // pagianaion
   const page = parseInt(req.query.page);
   try {
-    const hotels = await Hotel.find({ isActive: true })
+    const hotels = await Hotel.find({ isActive: true });
     res.status(200).json({
       success: true,
       count: hotels.length,
@@ -135,7 +137,7 @@ export const getAllHotelByAdminDelete = async (req, res) => {
   // pagianaion
   const page = parseInt(req.query.page);
   try {
-    const hotels = await Hotel.find({ isActive: false })
+    const hotels = await Hotel.find({ isActive: false });
     res.status(200).json({
       success: true,
       count: hotels.length,
@@ -335,7 +337,11 @@ export const deleteHotel = async (req, res) => {
 export const deleteHotelRoom = async (req, res) => {
   const id = req.params.id;
   try {
-    await HotelRoom.findByIdAndUpdate(id, { status: "Unavailable" });
+    await HotelRoom.findByIdAndUpdate(
+      id,
+      { status: "Available" },
+      { new: true }
+    );
     res.status(200).json({
       success: true,
       message: "Sussessfully delete the hotel room",

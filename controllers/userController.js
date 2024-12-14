@@ -96,8 +96,8 @@ export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       id,
-      { isDelete: true }, // Cập nhật thuộc tính isDelete
-      { new: true } // Trả về user đã được cập nhật
+      { isDelete: true },
+      { new: true }
     );
 
     if (!user) {

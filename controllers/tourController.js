@@ -214,7 +214,7 @@ export const getFeaturedTour = async (req, res) => {
   const page = parseInt(req.query.page);
 
   try {
-    const tours = await Tour.find({ featured: true })
+    const tours = await Tour.find({ featured: true, isDelete: false })
       .populate("reviews")
       .skip(page * 8)
       .limit(8);
@@ -238,7 +238,7 @@ export const getDomesticTour = async (req, res) => {
   const page = parseInt(req.query.page);
 
   try {
-    const tours = await Tour.find({ featured: false })
+    const tours = await Tour.find({ featured: false, isDelete: false })
       .populate("reviews")
       .skip(page * 8)
       .limit(8);
@@ -260,8 +260,8 @@ export const getDomesticTour = async (req, res) => {
 // get tour counts with all
 export const getTourCount = async (req, res) => {
   try {
-    const tourCount = await Tour.estimatedDocumentCount();
-    // const tourCount = await Tour.countDocuments({ featured: true });
+    // const tourCount = await Tour.estimatedDocumentCount();
+    const tourCount = await Tour.countDocuments({ isDelete: false });
 
     res.status(200).json({
       success: true,
@@ -278,7 +278,7 @@ export const getTourCount = async (req, res) => {
 // get tour counts with ForeignTours
 export const getForeignToursCount = async (req, res) => {
   try {
-    const tourCount = await Tour.countDocuments({ featured: true });
+    const tourCount = await Tour.countDocuments({ featured: true, isDelete: false });
 
     res.status(200).json({
       success: true,
@@ -295,7 +295,7 @@ export const getForeignToursCount = async (req, res) => {
 // get tour counts with DomesticTours
 export const getDomesticToursCount = async (req, res) => {
   try {
-    const tourCount = await Tour.countDocuments({ featured: false });
+    const tourCount = await Tour.countDocuments({ featured: false, isDelete: false });
 
     res.status(200).json({
       success: true,

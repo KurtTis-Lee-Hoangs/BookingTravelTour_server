@@ -40,6 +40,9 @@ const bookingSchema = new mongoose.Schema(
       default: false,
     },
     isDelete: { type: Boolean, default: false },
+    typeBooking: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

@@ -37,7 +37,7 @@ export const payment = async (orderId, type) => {
     description: `Payment for the order #${transID}`,
     bank_code: "",
     callback_url:
-      "https://6863-2001-ee0-4f4c-3880-91b4-c1d0-3398-c499.ngrok-free.app/api/v1/bookings/callback",
+      "https://b23c-2001-ee0-4f4c-6e30-54e8-5e45-5d1d-f524.ngrok-free.app/api/v1/bookings/callback",
   };
   const data =
     configPayment.app_id +

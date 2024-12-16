@@ -160,7 +160,8 @@ export const getAllBlogByAdminDeleted = async (req, res) => {
 // get blog counts
 export const getBlogCount = async (req, res) => {
   try {
-    const blogCount = await Blog.estimatedDocumentCount();
+    // const blogCount = await Blog.estimatedDocumentCount();
+    const blogCount = await Blog.countDocuments({ isDelete: false })
 
     res.status(200).json({
       success: true,

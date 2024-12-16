@@ -245,7 +245,11 @@ export const getFavorites = async (req, res) => {
 
   try {
     // const user = await User.findById(id);
-    const user = await User.findById(id).populate("favorites");
+    // const user = await User.findById(id).populate("favorites");
+    const user = await User.findById(id).populate({
+      path: "favorites",
+      match: { isDelete: false }, // Filter by isDelete: false
+    });
 
     if (!user) {
       return res

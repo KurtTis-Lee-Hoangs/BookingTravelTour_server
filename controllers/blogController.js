@@ -178,7 +178,7 @@ export const getBlogCount = async (req, res) => {
 // get blog by search
 export const getBlogBySearch = async (req, res) => {
   // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
-  const searchConditions = {};
+  const searchConditions = {isDelete:false};
 
   // Kiểm tra từng trường và thêm vào điều kiện nếu có giá trị
   if (req.query.title) {

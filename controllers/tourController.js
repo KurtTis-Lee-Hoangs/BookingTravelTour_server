@@ -178,7 +178,7 @@ export const getAllTourByAdminDeleted = async (req, res) => {
 // get tour by search
 export const getTourBySearch = async (req, res) => {
   // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
-  const searchConditions = {};
+  const searchConditions = {isDelete: false};
 
   // Kiểm tra từng trường và thêm vào điều kiện nếu có giá trị
   if (req.query.city) {
@@ -187,8 +187,12 @@ export const getTourBySearch = async (req, res) => {
   if (req.query.day) {
     searchConditions.day = { $eq: parseInt(req.query.day) };
   }
+  // if (req.query.maxGroupSize) {
+  //   searchConditions.maxGroupSize = { $eq: parseInt(req.query.maxGroupSize) };
+  // }
+
   if (req.query.maxGroupSize) {
-    searchConditions.maxGroupSize = { $eq: parseInt(req.query.maxGroupSize) };
+    searchConditions.maxGroupSize = { $gte: parseInt(req.query.maxGroupSize) }; // Điều kiện lớn hơn hoặc bằng
   }
 
   try {

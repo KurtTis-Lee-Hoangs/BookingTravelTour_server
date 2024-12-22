@@ -164,6 +164,13 @@ export const login = async (req, res) => {
       });
     }
 
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "This account has not been activated",
+      });
+    }
+
     // if user is exist then check the password or compare the password
     const checkCorrectPassword = await bcrypt.compare(
       req.body.password,

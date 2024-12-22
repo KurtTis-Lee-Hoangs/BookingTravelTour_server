@@ -97,7 +97,7 @@ export const getAllHotelByUser = async (req, res) => {
   // pagianaion
   const page = parseInt(req.query.page);
   try {
-    const hotels = await Hotel.find({ isActive: true })
+    const hotels = await Hotel.find({ isActive: true})
       .skip(page * 8)
       .limit(8);
     res.status(200).json({
@@ -291,7 +291,8 @@ export const updateHotelRoom = async (req, res) => {
 
 export const getHotelCount = async (req, res) => {
   try {
-    const hotelCount = await Hotel.estimatedDocumentCount();
+    // const hotelCount = await Hotel.estimatedDocumentCount();
+    const hotelCount = await Hotel.countDocuments({isActive: true});
     res.status(200).json({
       success: true,
       data: hotelCount,

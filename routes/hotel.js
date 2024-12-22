@@ -36,7 +36,7 @@ router.delete("/:id", deleteHotel);
 router.post("/payment", createHotelBooking)
 
 router.get("/rooms/:id", getAllHotelRoom);
-router.get("/rooms/:id", getSingleHotelRoom);
+router.get("/room/:id", getSingleHotelRoom);
 router.post("/room", createHotelRoom);
 router.put("/rooms/:id", verifyAdmin, updateHotelRoom)
 router.delete("/rooms/:id", verifyAdmin, deleteHotelRoom);

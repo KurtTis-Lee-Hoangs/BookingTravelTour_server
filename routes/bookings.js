@@ -1,14 +1,7 @@
 import express from "express";
-import {
-  createBooking,
-  updateBooking,
-  deleteBooking,
-  getBooking,
-  getAllBooking,
-  getUserBookings,
-} from "../controllers/bookingController.js";
-import { callback } from "../controllers/paymentController.js";
+import { createBooking, updateBooking, deleteBooking, getBooking, getAllBooking, getUserBookings } from "../controllers/bookingController.js";
 import { verifyUser, verifyAdmin } from "../utils/verifyToken.js";
+import { callback } from "../controllers/paymentController.js";
 
 const router = express.Router();
 

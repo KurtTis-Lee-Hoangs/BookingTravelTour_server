@@ -1,79 +1,24 @@
 import Booking from "../models/Booking.js";
-import { paymentZalopay } from "./paymentController.js";
+import { sendPaymentConfirmationEmail } from "../utils/sendEmail.js";
+import { payment } from "./paymentController.js";
 
 // Create new booking
 export const createBooking = async (req, res) => {
-  const {
-    userId,
-    userEmail,
-    tourId,
-    tourName,
-    fullName,
-    guestSize,
-    phone,
-    bookAt,
-    totalPrice,
-  } = req.body;
-  const newBooking = new Booking({
-    userId,
-    userEmail,
-    tourId,
-    tourName,
-    fullName,
-    guestSize,
-    phone,
-    bookAt,
-    totalPrice,
-    typeBooking: "tour",
-  });
+  const newBooking = new Booking(req.body);
 
   try {
     const savedBooking = await newBooking.save();
 
-    let paymentUrl;
-    if (paymentMethod === "ZaloPay") {
-      paymentUrl = await paymentZalopay(
-        savedBooking._id,
-        savedBooking.typeBooking
-      );
-      if (!paymentUrl) {
-        return res.status(503).json({
-          success: false,
-          message: "Payment creation failed.",
-        });
-      }
-      // Trả về URL để frontend xử lý việc chuyển hướng
-      return res.status(200).json({
-        success: true,
-        message: "Booking created successfully",
-        order: savedBooking,
-        paymentUrl: paymentUrl,
+    // const paymentUrl = await payment(savedBooking._id);
+    const paymentUrl = await payment(savedBooking._id, "tourBooking");
+    if (!paymentUrl) {
+      return res.status(503).json({
+        success: false,
+        message: "Payment creation failed.",
       });
     }
 
-    if (paymentMethod === "VNPay") {
-      paymentUrl = await paymentVnpay(
-        savedBooking._id,
-        savedBooking.typeBooking,
-        req,
-        res
-      );
-      if (!paymentUrl) {
-        return res.status(503).json({
-          success: false,
-          message: "Payment creation failed.",
-        });
-      }
-      // Trả về URL để frontend xử lý việc chuyển hướng
-      return res.status(200).json({
-        success: true,
-        message: "Booking created successfully",
-        order: savedBooking,
-        paymentUrl: paymentUrl,
-      });
-    }
     // Trả về URL để frontend xử lý việc chuyển hướng
-
     res.status(200).json({
       success: true,
       message: "Booking created successfully",
@@ -120,7 +65,19 @@ export const deleteBooking = async (req, res) => {
   const id = req.params.id;
 
   try {
-    await Booking.findByIdAndDelete(id);
+    // await Booking.findByIdAndDelete(id);
+    const booking = await Booking.findByIdAndUpdate(
+      id,
+      { isDelete: true },
+      { new: true }
+    );
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -157,7 +114,7 @@ export const getBooking = async (req, res) => {
 // Get all bookings
 export const getAllBooking = async (req, res) => {
   try {
-    const bookAll = await Booking.find();
+    const bookAll = await Booking.find({isDelete: false});
 
     res.status(200).json({
       success: true,
@@ -177,7 +134,7 @@ export const getAllBooking = async (req, res) => {
 export const getUserBookings = async (req, res) => {
   try {
     // Lọc bookings dựa trên userId trùng với _id người dùng đã đăng nhập
-    const bookings = await Booking.find({ userId: req.user.id });
+    const bookings = await Booking.find({ userId: req.user.id, isDelete: false });
 
     res.status(200).json({
       success: true,

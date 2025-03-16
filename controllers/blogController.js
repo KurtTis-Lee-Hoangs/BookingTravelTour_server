@@ -50,7 +50,19 @@ export const deleteBlog = async (req, res) => {
   const id = req.params.id;
 
   try {
-    await Blog.findByIdAndDelete(id);
+    // await Blog.findByIdAndDelete(id);
+    const blog = await Blog.findByIdAndUpdate(
+      id,
+      { isDelete: true }, // Cập nhật thuộc tính isDelete
+      { new: true }
+    );
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -90,7 +102,7 @@ export const getAllBlogByUser = async (req, res) => {
   const page = parseInt(req.query.page);
 
   try {
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({isDelete: false})
       .skip(page * 8)
       .limit(8);
 
@@ -109,9 +121,27 @@ export const getAllBlogByUser = async (req, res) => {
 };
 
 // Get all blog by admin
-export const getAllBlogByAdmin = async (req, res) => {
+export const getAllBlogByAdminNoDelete = async (req, res) => {
   try {
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({isDelete: false})
+
+    res.status(200).json({
+      success: true,
+      count: blogs.length,
+      message: "Sussessfully get all blogs",
+      data: blogs,
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: "Not found the blog. Try again",
+    });
+  }
+};
+
+export const getAllBlogByAdminDeleted = async (req, res) => {
+  try {
+    const blogs = await Blog.find({isDelete: true})
 
     res.status(200).json({
       success: true,
@@ -130,7 +160,8 @@ export const getAllBlogByAdmin = async (req, res) => {
 // get blog counts
 export const getBlogCount = async (req, res) => {
   try {
-    const blogCount = await Blog.estimatedDocumentCount();
+    // const blogCount = await Blog.estimatedDocumentCount();
+    const blogCount = await Blog.countDocuments({ isDelete: false })
 
     res.status(200).json({
       success: true,
@@ -147,7 +178,7 @@ export const getBlogCount = async (req, res) => {
 // get blog by search
 export const getBlogBySearch = async (req, res) => {
   // Tạo điều kiện tìm kiếm ban đầu là một đối tượng rỗng
-  const searchConditions = {};
+  const searchConditions = {isDelete:false};
 
   // Kiểm tra từng trường và thêm vào điều kiện nếu có giá trị
   if (req.query.title) {

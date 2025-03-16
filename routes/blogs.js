@@ -6,7 +6,8 @@ import {
     getSingleBlog,
     getAllBlogByUser,
     getBlogCount,
-    getAllBlogByAdmin,
+    getAllBlogByAdminNoDelete,
+    getAllBlogByAdminDeleted,
     getBlogBySearch,
 } from "../controllers/blogController.js";
 
@@ -30,7 +31,8 @@ router.get("/:id", getSingleBlog);
 router.get("/user/getAllBlogByUser", getAllBlogByUser);
 
 // get all tours admin
-router.get("/", verifyAdmin, getAllBlogByAdmin);
+router.get("/", verifyAdmin, getAllBlogByAdminNoDelete);
+router.get("/delete/getAllBlogByAdminDeleted", verifyAdmin, getAllBlogByAdminDeleted);
 
 // get blog counts
 router.get("/search/getBlogCount", getBlogCount);

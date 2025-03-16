@@ -7,21 +7,97 @@ import { sendVerificationEmail } from "../utils/sendEmail.js";
 // User registrantion
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
-  try {
+  // try {
+  //   const existEmail = await User.findOne({email: email})
+  //   if (existEmail) {
+  //     return res
+  //       .status(401)
+  //       .json({ success: false, message: "Email is already registered." });
+  //   }
 
-    const existEmail = await User.findOne({email: email})
-    if (existEmail) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Email is already registered." });
+  //   // if (!req.body.password) {
+  //   if (!password) {
+  //     return res
+  //       .status(401)
+  //       .json({ success: false, message: "Password is required" });
+  //   }
+
+  //   // hasing password
+  //   const salt = await bcrypt.genSaltSync(10);
+  //   // const hash = bcrypt.hashSync(req.body.password, salt);
+  //   const hash = bcrypt.hashSync(password, salt);
+
+  //   const newUser = new User({
+  //     // username: req.body.username,
+  //     // email: req.body.email,
+  //     username,
+  //     email,
+  //     password: hash,
+  //     //   password: req.body.password,
+  //     photo: req.body.photo,
+  //   });
+
+  //   await newUser.save();
+
+  //   const verificationToken = jwt.sign(
+  //     { user: newUser._id },
+  //     process.env.JWT_SECRET_KEY,
+  //     { expiresIn: "1h" }
+  //   );
+
+  //   // Generate the verification link
+  //   const verificationLink = `${req.protocol}://${req.get(
+  //     "host"
+  //   )}/api/v1/auth/verify-email/${verificationToken}`;
+  //   // Send the verification email
+  //   await sendVerificationEmail(email, verificationLink);
+
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "Successfully created. User registered successfully",
+  //     message:
+  //       "Account registered successfully! Please verify your email to activate your account.",
+  //   });
+  // } catch (err) {
+  //   res.status(500).json({
+  //     success: false,
+  //     // message: "Failed to create. User registration failed. Try again",
+  //     message: err.message,
+  //   });
+  // }
+
+  try {
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email: email });
+
+    if (existingUser) {
+      if (existingUser.isDelete) {
+        // If the user is deleted, update their information
+        existingUser.username = username;
+        existingUser.password = await bcrypt.hash(password, 10);
+        existingUser.photo = req.body.photo;
+        existingUser.isDelete = false; // Mark the user as not deleted
+
+        await existingUser.save();
+        return res.status(200).json({
+          success: true,
+          message: "Successfully created. User registered successfully!",
+        });
+      } else {
+        return res
+          .status(401)
+          .json({ success: false, message: "Email is already registered." });
+      }
     }
+
+    // If the email does not exist, proceed with registration
     if (!password) {
       return res
         .status(401)
         .json({ success: false, message: "Password is required" });
     }
 
-    // hasing password
+    // Hash password
     const salt = await bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
 
@@ -29,11 +105,12 @@ export const register = async (req, res) => {
       username,
       email,
       password: hash,
-      //   password: req.body.password,
       photo: req.body.photo,
     });
 
     await newUser.save();
+
+    // Generate verification token
     const verificationToken = jwt.sign(
       { user: newUser._id },
       process.env.JWT_SECRET_KEY,
@@ -44,14 +121,13 @@ export const register = async (req, res) => {
     const verificationLink = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/auth/verify-email/${verificationToken}`;
-
-    // Send the verification email
+    
+    // Send verification email
     await sendVerificationEmail(email, verificationLink);
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message:
-        "Account registered successfully! Please verify your email to activate your account.",
+      message: "Account registered successfully! Please verify your email to activate your account.",
     });
   } catch (err) {
     res.status(500).json({
@@ -69,23 +145,32 @@ export const login = async (req, res) => {
       .status(401)
       .json({ success: false, message: "Password is required" });
   }
+
   try {
     const user = await User.findOne({ email });
 
     // if user doesn't exist
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
-    if (!user.isActive) {
-      return res.status(404).json({
+    if (user.isDelete) {
+      return res.status(403).json({
         success: false,
-        message: "Please active your account before login. Or you can contact to administrator to active account",
+        message: "This account has been deleted",
       });
-    } 
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "This account has not been activated",
+      });
+    }
+
     // if user is exist then check the password or compare the password
     const checkCorrectPassword = await bcrypt.compare(
       req.body.password,
@@ -108,6 +193,8 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET_KEY,
       { expiresIn: "15d" }
     );
+
+    // set token in browser cookies aand send the response to the client
     res.cookie("accessToken", token, {
       httpOnly: true,
       exprires: token.expiresIn,
@@ -146,6 +233,7 @@ export const googleLogin = async (req, res) => {
   const { credential } = req.body;
   try {
     const userData = await verifyGoogleToken(credential);
+    // console.log(userData);
 
     const { sub: googleId, name: username, email, picture: avatar } = userData;
     let user = await User.findOne({ email });
@@ -153,8 +241,7 @@ export const googleLogin = async (req, res) => {
     if (!user) {
       user = await User.create({ googleId, username, email, avatar });
     }
-    user.isActive = true;
-    
+
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET_KEY,
@@ -168,13 +255,18 @@ export const googleLogin = async (req, res) => {
       // secure: process.env.NODE_ENV === "production", // Use secure cookies in production
       // sameSite: "strict",
     });
+
+
     // Tiếp tục xử lý đăng nhập và trả về token nếu thành công
-    res.status(200).json({
-      message: "Login successful",
-      token: token,
-      data: user,
-      role: user.role,
-    });
+    // res.status(200).json({ message: "Login successful", token: token, data: user });
+    res
+      .status(200)
+      .json({
+        message: "Login successful",
+        token: token,
+        data: user,
+        role: user.role,
+      });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -182,11 +274,9 @@ export const googleLogin = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
   const { token } = req.params;
-
   try {
     // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
     // Find the account by the decoded ID
     const userId = await User.findById(decoded.user);
     if (!userId) {
@@ -194,14 +284,12 @@ export const verifyEmail = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Account not found" });
     }
-
     // If the account is already verified
     if (userId.isActive) {
       return res
         .status(400)
         .json({ success: false, message: "Account already verified" });
     }
-
     // Set the account to verified
     userId.isActive = true;
     await userId.save();
@@ -216,7 +304,6 @@ export const verifyEmail = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Invalid verification token" });
     }
-
     res.status(500).json({
       success: false,
       message: "An error occurred during verification.",

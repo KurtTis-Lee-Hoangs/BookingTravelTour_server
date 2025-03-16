@@ -32,10 +32,6 @@ const hotelRoomSchema = new mongoose.Schema(
         type: String,
       },
     ],
-    availableRooms: {
-      type: Number,
-      required: true,
-    },
     status: {
       type: String,
       enum: ["Available", "Unavailabe"],

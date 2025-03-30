@@ -1,5 +1,4 @@
 import express from "express";
-
 const router = express.Router();
 import {
   createHotel,
@@ -9,9 +8,7 @@ import {
   getAllHotelByAdmin,
   getAllHotelByAdminDelete,
   getHotelCount,
-  getHotelRoomCount,
   getSingleHotel,
-  getUserBookings,
   updateHotel,
   updateHotelRoom,
   getUserBookings,
@@ -33,14 +30,13 @@ router.get("/getAllHotelByAdminDelete", getAllHotelByAdminDelete);
 router.get("/:id", getSingleHotel);
 router.get("/search/getHotelCount", getHotelCount);
 router.post("/", createHotel);
-router.put("/:id", updateHotel)
+router.put("/:id", updateHotel);
 router.delete("/:id", deleteHotel);
 
 router.post("/payment", createHotelBooking)
 
 router.get("/rooms/:id", getAllHotelRoom);
 router.get("/room/:id", getSingleHotelRoom);
-router.get("/room/search/getHotelRoomCount", getHotelRoomCount)
 router.post("/room", createHotelRoom);
 router.put("/rooms/:id", verifyAdmin, updateHotelRoom)
 router.delete("/rooms/:id", verifyAdmin, deleteHotelRoom);
